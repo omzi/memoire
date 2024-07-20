@@ -3,7 +3,6 @@
 import { ReactNode } from 'react';
 import Providers from '#/app/providers';
 import { ToastContainer } from 'react-toastify';
-import { Next13ProgressBar } from 'next13-progressbar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import '#/app/fonts.css';
@@ -39,14 +38,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
               theme='colored'
             />
             {children}
-            <Next13ProgressBar
-              height='3.5px'
-              color='#222FE6'
-              options={{ showSpinner: false }}
-              delay={0}
-              startPosition={0.5}
-              showOnShallow
-            />
           </Providers>
         </body>
       </html>

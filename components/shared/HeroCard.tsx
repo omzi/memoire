@@ -3,12 +3,11 @@
 import { usePathname } from 'next/navigation';
 import { useQueryState, parseAsBoolean } from 'nuqs';
 import HeroButton from '#/components/shared/HeroButton';
-import { LayoutGridIcon, SparkleIcon, SparklesIcon, StarIcon, Trash2Icon, UserRoundIcon } from 'lucide-react';
+import { CreditCardIcon, LayoutGridIcon, SparkleIcon, SparklesIcon, StarIcon, UserRoundIcon } from 'lucide-react';
 
 const HeroCard = () => {
 	const pathname = usePathname();
 	const [starred] = useQueryState('starred', parseAsBoolean.withDefault(false));
-	const [trashed] = useQueryState('trashed', parseAsBoolean.withDefault(false));
 
 	return (
 		<section className='relative flex flex-col justify-center items-center gap-y-6 rounded-2xl bg-gradient-to-r from-blue-600 to-violet-600 p-5 sm:p-10 shadow-inner'>
@@ -29,7 +28,7 @@ const HeroCard = () => {
 					label='Home'
 					path='/home'
 					icon={LayoutGridIcon}
-					active={pathname === '/home' && !starred && !trashed}
+					active={pathname === '/home' && !starred}
 				/>
 				<HeroButton
 					isLink
@@ -40,17 +39,17 @@ const HeroCard = () => {
 				/>
 				<HeroButton
 					isLink
-					label='Trash'
-					path='/home?trashed=true'
-					icon={Trash2Icon}
-					active={pathname === '/home' && trashed}
-				/>
-				<HeroButton
-					isLink
 					label='Profile'
 					path='/profile'
 					icon={UserRoundIcon}
 					active={pathname === '/profile'}
+				/>
+				<HeroButton
+					isLink
+					label='Billing'
+					path='/billing'
+					icon={CreditCardIcon}
+					active={pathname === '/billing'}
 				/>
 			</ul>
 		</section>

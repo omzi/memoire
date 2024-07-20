@@ -25,6 +25,8 @@ model User {
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+
+  projects Project[]
 }
 
 model Account {
@@ -78,4 +80,63 @@ model TwoFactorConfirmation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+type Metadata {
+  date     DateTime
+  location String
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+}
+
+model Project {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  description    String?
+  isStarred      Boolean     @default(false)
+  needsNarration Boolean     @default(true)
+  needsMusic     Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  userId         String      @db.ObjectId
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media          Media[]
+  narration      Narration?
+  musicTrack     MusicTrack?
+}
+
+model Media {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  url         String
+  type        MediaType
+  metadata    Metadata
+  description String?
+  transition  String
+  createdAt   DateTime  @default(now())
+  projectId   String    @db.ObjectId
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Narration {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  transcript String
+  audioUrl   String
+  createdAt  DateTime @default(now())
+  projectId  String   @db.ObjectId
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId])
+}
+
+model MusicTrack {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  createdAt DateTime @default(now())
+  projectId String   @db.ObjectId
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId])
 }

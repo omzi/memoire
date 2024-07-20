@@ -1,9 +1,20 @@
 'use client';
 
-import ComingSoonSection from '#/components/ComingSoonSection';
+import ProjectList from '#/components/ProjectList';
 
-const Home = () => {
-	return <ComingSoonSection />;
+interface HomeProps {
+	userId: string;
+};
+
+const Home = ({
+	userId
+}: HomeProps) => {
+
+	return (
+		<div>
+			<ProjectList userId={userId} />
+		</div>
+	);
 }
 
 export default Home;

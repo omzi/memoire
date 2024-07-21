@@ -42,7 +42,7 @@ const ConfirmDeleteModal = () => {
 			toast.success('Project deleted!');
 			onClose();
 
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
 
 			router.push('/home');
 		}

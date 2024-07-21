@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '#/lib/utils';
+import { useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Loader from 'react-ts-loaders';
 import { toast } from 'react-toastify';
@@ -11,10 +12,9 @@ import { Button } from '#/components/ui/button';
 import { useQueryState, parseAsBoolean } from 'nuqs';
 import { createProject } from '#/lib/actions/mutations';
 import ProjectCard from '#/components/shared/ProjectCard';
-import getProjectsByUserId from '#/lib/actions/getProjectsByUserId';
+import { getProjectsByUserId } from '#/lib/actions/queries';
 import NewProjectButton from '#/components/shared/NewProjectButton';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 interface ProjectListProps {
 	userId: string;
@@ -27,7 +27,7 @@ const ProjectList = ({
 	const queryClient = useQueryClient();
 	const [starred] = useQueryState('starred', parseAsBoolean.withDefault(false));
 	const { isPending: getProjectsLoading, data: projects, refetch } = useQuery({
-		queryKey: ['userProjects'],
+		queryKey: ['projects'],
 		queryFn: async () => {
 			try {
 				const projects = await getProjectsByUserId(userId, starred);
@@ -58,15 +58,15 @@ const ProjectList = ({
 		onSuccess: (response) => {
 			toast.success('Project created!');
 
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
-			queryClient.invalidateQueries({ queryKey: [`userProjects-${response.id}`] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
+			queryClient.invalidateQueries({ queryKey: [`project-${response.id}`] });
 
 			router.push(`/project/${response.id}`);
 		}
 	});
 
 	useEffect(() => {
-		queryClient.removeQueries({ queryKey: ['userProjects'], exact: true });
+		queryClient.removeQueries({ queryKey: ['projects'], exact: true });
 		refetch();
 	}, [starred]);
 

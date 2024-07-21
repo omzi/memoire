@@ -47,8 +47,8 @@ const ProjectCard = ({
 			toast.error('Failed to star project ;(');
 		},
 		onSuccess: (response) => {
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
-			queryClient.invalidateQueries({ queryKey: [`userProjects-${response.id}`] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
+			queryClient.invalidateQueries({ queryKey: [`project-${response.id}`] });
 		}
 	});
 	const { mutate: unstarProjectMutation, isPending: unstarProjectLoading } = useMutation({
@@ -67,8 +67,8 @@ const ProjectCard = ({
 			toast.error('Failed to unstar project ;(');
 		},
 		onSuccess: (response) => {
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
-			queryClient.invalidateQueries({ queryKey: [`userProjects-${response.id}`] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
+			queryClient.invalidateQueries({ queryKey: [`project-${response.id}`] });
 		}
 	});
 

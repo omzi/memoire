@@ -15,8 +15,8 @@ import { toast } from 'react-toastify';
 import { Input } from '#/components/ui/input';
 import { Button } from '#/components/ui/button';
 import { useRenameModal } from '#/hooks/useRenameModal';
-import { FormEventHandler, useEffect, useState } from 'react';
 import { renameProject } from '#/lib/actions/mutations';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const RenameModal = () => {
@@ -27,8 +27,7 @@ const RenameModal = () => {
 		mutationFn: async ({ id, title }: { id: string, title: string }) => {
 			try {
 				const project = await renameProject({ id, title: title.trim() });
-
-				console.log('Rename Project Mutation :>>', project);
+				
 				return project;
 			} catch (error) {
 				throw error;
@@ -43,8 +42,8 @@ const RenameModal = () => {
 			toast.success('Project renamed!');
 			onClose();
 
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
-			queryClient.invalidateQueries({ queryKey: [`userProjects-${response.id}`] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
+			queryClient.invalidateQueries({ queryKey: [`project-${response.id}`] });
 		}
 	});
 

@@ -39,8 +39,8 @@ const NewProjectButton = ({
 		onSuccess: (response) => {
 			toast.success('Project created!');
 			
-			queryClient.invalidateQueries({ queryKey: ['userProjects'] });
-			queryClient.invalidateQueries({ queryKey: [`userProjects-${response.id}`] });
+			queryClient.invalidateQueries({ queryKey: ['projects'] });
+			queryClient.invalidateQueries({ queryKey: [`project-${response.id}`] });
 			
 			router.push(`/project/${response.id}`);
 		}

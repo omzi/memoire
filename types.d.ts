@@ -1,4 +1,4 @@
-import { $Enums } from '@prisma/client';
+import { Prisma, $Enums } from '@prisma/client';
 import { type DefaultSession } from 'next-auth';
 
 export type ExtendedUser = DefaultSession['user'] & {
@@ -17,3 +17,5 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT extends ExtendedUser {}
 }
+
+export type ProjectType = Prisma.ProjectGetPayload<true>;

@@ -99,7 +99,7 @@ const ProjectList = ({
 		return (
 			<div className='h-full flex flex-col items-center justify-center'>
 				<Image
-					src='/images/empty-starred.png'
+					src='/images/empty-starred.webp'
 					width={348}
 					height={500}
 					alt='No starred project'
@@ -116,7 +116,7 @@ const ProjectList = ({
 		return (
 			<div className='h-full flex flex-col items-center justify-center'>
 				<Image
-					src='/images/empty-project.png'
+					src='/images/empty-project.webp'
 					width={404}
 					height={500}
 					alt='No projects created, yet ;)'

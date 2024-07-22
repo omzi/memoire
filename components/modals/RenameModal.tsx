@@ -5,8 +5,10 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
+	DialogTitle,
 	DialogClose,
-	DialogFooter
+	DialogFooter,
+	DialogDescription
 } from '#/components/ui/dialog';
 import { cn } from '#/lib/utils';
 import { Pen } from 'lucide-react';
@@ -17,6 +19,7 @@ import { Button } from '#/components/ui/button';
 import { useRenameModal } from '#/hooks/useRenameModal';
 import { renameProject } from '#/lib/actions/mutations';
 import { FormEventHandler, useEffect, useState } from 'react';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const RenameModal = () => {
@@ -73,9 +76,12 @@ const RenameModal = () => {
 								<Pen className='w-6 h-6 text-blue-600' />
 							</div>
 							<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left flex-1'>
-								<h3 className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>
-									Edit project title
-								</h3>
+								<DialogTitle className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>Edit project title</DialogTitle>
+								<DialogDescription>
+									<VisuallyHidden.Root>
+										Edit project title
+									</VisuallyHidden.Root>
+								</DialogDescription>
 								<div className='my-2'>
 									<Input
 										disabled={renameProjectLoading}

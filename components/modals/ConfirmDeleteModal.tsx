@@ -1,13 +1,15 @@
 'use client';
 
-import { cn } from '#/lib/utils';
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
+	DialogTitle,
 	DialogClose,
-	DialogFooter
+	DialogFooter,
+	DialogDescription
 } from '#/components/ui/dialog';
+import { cn } from '#/lib/utils';
 import { MouseEvent } from 'react';
 import Loader from 'react-ts-loaders';
 import { toast } from 'react-toastify';
@@ -16,6 +18,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { deleteProject } from '#/lib/actions/mutations';
 import { useConfirmDelete } from '#/hooks/useConfirmDelete';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const ConfirmDeleteModal = () => {
@@ -69,10 +72,13 @@ const ConfirmDeleteModal = () => {
 							<AlertTriangle className='w-6 h-6 text-red-600' />
 						</div>
 						<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left'>
-							<h3 className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>
-								Delete project?
-							</h3>
-							<div className='mt-2'>
+							<DialogTitle className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>Delete project?</DialogTitle>
+							<DialogDescription>
+								<VisuallyHidden.Root>
+									Delete project?
+								</VisuallyHidden.Root>
+							</DialogDescription>
+							<div className='my-2'>
 								<p className='text-sm text-gray-500'>
 									Proceeding with this action will permanently delete the project & all of its associated content. Are you sure you want to proceed with deleting the project & its contents?
 								</p>

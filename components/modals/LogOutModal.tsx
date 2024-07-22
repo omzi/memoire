@@ -7,7 +7,8 @@ import { signOut } from 'next-auth/react';
 import { useLogOut } from '#/hooks/useLogOut';
 import { Button } from '#/components/ui/button';
 import { AlertTriangleIcon } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader } from '#/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '#/components/ui/dialog';
 
 const LogOutModal = () => {
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -34,10 +35,13 @@ const LogOutModal = () => {
 							<AlertTriangleIcon className='w-6 h-6 text-red-600' />
 						</div>
 						<div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left'>
-							<h3 className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>
-								Confirm log out
-							</h3>
-							<div className='mt-2'>
+							<DialogTitle className='text-base font-semibold leading-6 text-gray-900 dark:text-gray-100'>Confirm log out</DialogTitle>
+							<DialogDescription>
+								<VisuallyHidden.Root>
+									Confirm log out
+								</VisuallyHidden.Root>
+							</DialogDescription>
+							<div className='my-2'>
 								<p className='text-sm text-gray-500'>
 									Are you sure you want to log out? You will be signed out of
 									your account, and any unsaved changes may be lost.

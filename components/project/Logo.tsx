@@ -5,7 +5,7 @@ import TooltipHint from '#/components/shared/TooltipHint';
 const Logo = () => {
 	return (
 		<TooltipHint label='Home' side='bottom' align='center'>
-			<Link href='/home'>
+			<Link href='/home' className='ml-3'>
 				<div className='size-10 relative shrink-0'>
 					<Image
 						src='/images/logo.png'

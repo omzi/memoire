@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { ProjectType } from '#/types';
 import { toast } from 'react-toastify';
 import { Navbar } from '#/components/project/NavBar';
-import ComingSoonSection from '#/components/ComingSoonSection';
+import ProjectEditor from '#/components/project/ProjectEditor';
 import { useMutationState, useQuery } from '@tanstack/react-query';
 import { getProjectByProjectAndUserId } from '#/lib/actions/queries';
 
@@ -45,7 +45,7 @@ const ProjectId = ({
 
 	useEffect(() => {
 		if (currentData) {
-			console.log('currentData :>>', currentData);
+			// console.log('currentData :>>', currentData);
 			window.document.title = `${currentData.title} / Project ~ Memoire`;
 		}
 	}, [currentData]);
@@ -53,7 +53,7 @@ const ProjectId = ({
 	return (
 		<div className='h-svh flex flex-col'>
 			<Navbar initialData={initialData} />
-			<ComingSoonSection />
+			<ProjectEditor />
 		</div>
 	);
 }

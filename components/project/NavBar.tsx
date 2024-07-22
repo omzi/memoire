@@ -43,7 +43,7 @@ export const Navbar = ({
 	const isPending = currentStatus === 'pending';
 
 	return (
-		<nav className='w-full flex items-center p-4 h-[68px] gap-x-8 border-b lg:pl-[34px]'>
+		<nav className='w-full flex items-center p-4 h-[4.5rem] gap-x-8 border-b'>
 			<Logo />
 			<div className='w-full flex items-center gap-x-1 h-full'>
 				<TitleBox initialData={initialData} />

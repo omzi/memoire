@@ -68,6 +68,7 @@ const ProjectList = ({
 	useEffect(() => {
 		queryClient.removeQueries({ queryKey: ['projects'], exact: true });
 		refetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [starred]);
 
 	const handleCreateClick = () => {

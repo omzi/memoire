@@ -35,7 +35,7 @@ const ProjectList = ({
 				console.log('Get Projects Query :>>', projects);
 				return projects;
 			} catch (error) {
-				toast.error('An error occurred while fetching your projects ;(');
+				toast.error('Failed to fetch your projects ;(');
 				throw error;
 			}
 		}
@@ -106,7 +106,7 @@ const ProjectList = ({
 					fetchPriority='high'
 					className='w-[150px] aspect-[348/500]'
 				/>
-				<h2 className='text-2xl font-semibold mt-6'>No starred project</h2>
+				<h2 className='text-2xl font-semibold mt-6'>No Starred Project</h2>
 				<p className='text-muted-foreground text-sm mt-2'>Try starring a project</p>
 			</div>
 		)

@@ -3,7 +3,7 @@ const nextConfig = {
 	skipMiddlewareUrlNormalize: true,
 	images: {
 		dangerouslyAllowSVG: true,
-		domains: ['api.dicebear.com']
+		domains: ['api.dicebear.com', 'files.edgestore.dev']
 	}
 };
 

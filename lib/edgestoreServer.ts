@@ -3,11 +3,7 @@ import { initEdgeStoreClient } from '@edgestore/server/core';
 
 const edgeStore = initEdgeStore.create();
 export const edgeStoreRouter = edgeStore.router({
-	chatFiles: edgeStore.fileBucket()
-		.beforeDelete(() => {
-			return true;
-		}),
-	paperFiles: edgeStore.fileBucket()
+	projectFiles: edgeStore.fileBucket()
 		.beforeDelete(() => {
 			return true;
 		})

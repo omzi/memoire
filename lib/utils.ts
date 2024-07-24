@@ -121,3 +121,139 @@ export const compileTemplate = <T extends Record<string, any>>(template: string,
     return trimmedKey in values ? String(values[trimmedKey]) : `{{${trimmedKey}}}`;
   });
 };
+
+export const acceptedFileTypes = {
+  'image/png': ['.png'],
+  'image/jpg': ['.jpg'],
+  'image/jpeg': ['.jpeg'],
+  'image/webp': ['.webp'],
+  'image/tiff': ['.tiff'],
+  'video/mp4': ['.mp4'],
+  'video/x-msvideo': ['.avi'],
+  'video/x-matroska': ['.mkv'],
+  'video/quicktime': ['.mov'],
+  'video/webm': ['.webm']
+};
+
+export const getPhotoDimensions = (dataURI: string): Promise<{ width: number; height: number }> => {
+  return new Promise(resolve => {
+    const image = new Image();
+
+    image.onload = () => {
+      const dimensions = {
+        width: image.naturalWidth,
+        height: image.naturalHeight
+      };
+      image.remove();
+      resolve(dimensions);
+    };
+    
+    image.src = dataURI;
+  });
+};
+
+export const getVideoDimensions = (dataURI: string): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+
+    video.onloadedmetadata = () => {
+      const dimensions = {
+        width: video.videoWidth,
+        height: video.videoHeight
+      };
+      video.remove();
+      resolve(dimensions);
+    };
+
+    video.onerror = (error) => {
+      reject(error);
+    };
+
+    video.src = dataURI;
+  });
+};
+
+export const transitions = [
+  {
+    id: 'fade',
+    text: 'Fade',
+    preview: '/images/transitions/fade.gif'
+  },
+  {
+    id: 'fadeblack',
+    text: 'Fade To Black',
+    preview: '/images/transitions/fadeblack.gif'
+  },
+  {
+    id: 'fadewhite',
+    text: 'Fade To White',
+    preview: '/images/transitions/fadewhite.gif'
+  },
+  {
+    id: 'distance',
+    text: 'Distance',
+    preview: '/images/transitions/distance.gif'
+  },
+  {
+    id: 'wipeleft',
+    text: 'Wipe Left',
+    preview: '/images/transitions/wipeleft.gif'
+  },
+  {
+    id: 'wiperight',
+    text: 'Wipe Right',
+    preview: '/images/transitions/wiperight.gif'
+  },
+  {
+    id: 'wipeup',
+    text: 'Wipe Up',
+    preview: '/images/transitions/wipeup.gif'
+  },
+  {
+    id: 'wipedown',
+    text: 'Wipe Down',
+    preview: '/images/transitions/wipedown.gif'
+  },
+  {
+    id: 'slideleft',
+    text: 'Slide Left',
+    preview: '/images/transitions/slideleft.gif'
+  },
+  {
+    id: 'slideright',
+    text: 'Slide Right',
+    preview: '/images/transitions/slideright.gif'
+  },
+  {
+    id: 'slideup',
+    text: 'Slide Up',
+    preview: '/images/transitions/slideup.gif'
+  },
+  {
+    id: 'slidedown',
+    text: 'Slide Down',
+    preview: '/images/transitions/slidedown.gif'
+  },
+  {
+    id: 'smoothleft',
+    text: 'Smooth Left',
+    preview: '/images/transitions/smoothleft.gif'
+  },
+  {
+    id: 'smoothright',
+    text: 'Smooth Right',
+    preview: '/images/transitions/smoothright.gif'
+  },
+  {
+    id: 'smoothup',
+    text: 'Smooth Up',
+    preview: '/images/transitions/smoothup.gif'
+  },
+  {
+    id: 'smoothdown',
+    text: 'Smooth Down',
+    preview: '/images/transitions/smoothdown.gif'
+  }
+] as const;
+
+export const placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+Pr1638ACaED3/nOThIAAAAASUVORK5CYII=';

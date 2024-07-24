@@ -1,5 +1,7 @@
+import { transitions } from '#/lib/utils';
 import { Prisma, $Enums } from '@prisma/client';
 import { type DefaultSession } from 'next-auth';
+import { getProjectMedia } from '#/lib/actions/queries';
 
 export type ExtendedUser = DefaultSession['user'] & {
   id: string;
@@ -21,3 +23,18 @@ declare module 'next-auth/jwt' {
 export type ProjectType = Prisma.ProjectGetPayload<true>;
 
 export type ActivePane = 'media' | 'narration' | 'music' | 'settings' | null;
+
+export interface UploadResult {
+  url: string;
+  preview?: string;
+  file?: File;
+};
+
+export interface MediaMetadata extends UploadResult {
+  width: number;
+  height: number;
+  type: $Enums.MediaType;
+};
+
+export type ProjectMediaType = Awaited<ReturnType<typeof getProjectMedia>>;
+export type TransitionType = typeof transitions[number]['id'];

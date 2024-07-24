@@ -2,7 +2,6 @@
 
 import { cn } from '#/lib/utils';
 import { ActivePane } from '#/types';
-import { ScrollArea } from '#/components/ui/scroll-area';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
 
@@ -30,9 +29,9 @@ const MusicPane = ({
 				title='Music'
 				description='Generate background music for your project with AI.'
 			/>
-			<ScrollArea>
+			<div className='p-3 flex-1 scrollbar-thin overflow-y-auto'>
 
-			</ScrollArea>
+			</div>
 			<SidebarPaneCloseButton pane='music' activePane={activePane} onClick={onClose} />
 		</aside>
 	);

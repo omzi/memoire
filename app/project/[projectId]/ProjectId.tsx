@@ -53,7 +53,7 @@ const ProjectId = ({
 	return (
 		<div className='h-svh flex flex-col'>
 			<Navbar initialData={initialData} />
-			<ProjectEditor />
+			<ProjectEditor projectId={params.projectId} />
 		</div>
 	);
 }

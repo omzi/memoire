@@ -2,7 +2,6 @@
 
 import { cn } from '#/lib/utils';
 import { ActivePane } from '#/types';
-import { ScrollArea } from '#/components/ui/scroll-area';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
 
@@ -30,9 +29,9 @@ const SettingsPane = ({
 				title='Settings'
 				description='Customize your project settings & preferences.'
 			/>
-			<ScrollArea>
+			<div className='p-3 flex-1 scrollbar-thin overflow-y-auto'>
 				
-			</ScrollArea>
+			</div>
 			<SidebarPaneCloseButton pane='settings' activePane={activePane} onClick={onClose} />
 		</aside>
 	);

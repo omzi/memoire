@@ -9,7 +9,13 @@ import MusicPane from '#/components/project/panes/MusicPane';
 import SettingsPane from '#/components/project/panes/SettingsPane';
 import NarrationPane from '#/components/project/panes/NarrationPane';
 
-const ProjectEditor = () => {
+interface ProjectEditorProps {
+	projectId: string;
+};
+
+const ProjectEditor = ({
+	projectId
+}: ProjectEditorProps) => {
 	const [activePane, setActivePane] = useState<ActivePane>('media');
 
 	const onPaneChange = (pane: ActivePane) => {
@@ -23,6 +29,7 @@ const ProjectEditor = () => {
 				onPaneChange={onPaneChange}
 			/>
 			<MediaPane
+				projectId={projectId}
 				activePane={activePane}
 				onPaneChange={onPaneChange}
 			/>

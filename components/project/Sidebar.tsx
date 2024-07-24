@@ -1,10 +1,10 @@
 'use client';
 
 import {
-	ImageIcon,
+	MicIcon,
 	MusicIcon,
 	SettingsIcon,
-	MicIcon
+	ImagePlusIcon
 } from 'lucide-react';
 import { ActivePane } from '#/types';
 import SidebarItem from '#/components/project/SidebarItem';
@@ -22,7 +22,7 @@ const Sidebar = ({
 		<aside className='bg-white flex flex-col w-[100px] z-30 h-full border-r overflow-y-auto'>
 			<div className='flex flex-col m-1.5 space-y-1.5'>
 				<SidebarItem
-					icon={ImageIcon}
+					icon={ImagePlusIcon}
 					label='Media'
 					isActive={activePane === 'media'}
 					onClick={() => onPaneChange('media')}

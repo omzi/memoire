@@ -13,7 +13,7 @@ export const generateMetadata = async ({ params }: PageProps) => {
 
 	return {
 		title: `${projectTitle} / Project ~ Memoire`,
-		description: `${projectTitle}`
+		description: `A project on Memoire`
 	} as Metadata;
 };
 

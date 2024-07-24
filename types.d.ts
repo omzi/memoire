@@ -21,6 +21,7 @@ declare module 'next-auth/jwt' {
 }
 
 export type ProjectType = Prisma.ProjectGetPayload<true>;
+export type MediaItemType = Prisma.MediaGetPayload<true>;
 
 export type ActivePane = 'media' | 'narration' | 'music' | 'settings' | null;
 

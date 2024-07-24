@@ -257,3 +257,24 @@ export const transitions = [
 ] as const;
 
 export const placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+Pr1638ACaED3/nOThIAAAAASUVORK5CYII=';
+
+export const areArraysEqual = (firstArray: string[], otherArray: string[]): boolean => {
+  if (firstArray.length !== otherArray.length) {
+    return false;
+  }
+  
+  const sortedFirstArray = [...firstArray].sort();
+  const sortedOtherArray = [...otherArray].sort();
+  
+  return sortedFirstArray.every((value, index) => value === sortedOtherArray[index]);
+};
+
+export const reorderByField = <T>(items: T[], sortedIds: any[], field: keyof T): T[] => {
+  const itemMap: Record<string, T> = {};
+  items.forEach(item => {
+    const key = item[field] as unknown as string;
+    itemMap[key] = item;
+  });
+
+  return sortedIds.map(id => itemMap[id as unknown as string]).filter(Boolean);
+};

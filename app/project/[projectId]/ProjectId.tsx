@@ -44,7 +44,7 @@ const ProjectId = ({
 	});
 
 	useEffect(() => {
-		if (currentData) {
+		if (currentData && currentData.title) {
 			// console.log('currentData :>>', currentData);
 			window.document.title = `${currentData.title} / Project ~ Memoire`;
 		}

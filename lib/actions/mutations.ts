@@ -3,6 +3,7 @@
 import prisma from '#/lib/prisma';
 import { MediaMetadata } from '#/types';
 import { Prisma } from '@prisma/client';
+import { areArraysEqual } from '#/lib/utils';
 
 export const createProject = async (data: Prisma.ProjectCreateInput) => {
   const project = await prisma.project.create({ data });
@@ -62,7 +63,7 @@ export const updateMedia = async ({
   });
 
   if (!media) {
-    throw new Error('Project not found!');
+    throw new Error('Media not found!');
   }
 
 	// Ensure sensitive fields like projectId, id, createdAt, and updatedAt are not changed
@@ -84,6 +85,27 @@ export const updateMedia = async ({
 	});
 
 	return updatedMedia;
+};
+
+export const saveMediaOrder = async ({
+	projectId,
+	newMediaOrder
+}: { projectId: string; newMediaOrder: string[] }) => {
+	const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { mediaOrder: true },
+  });
+
+	if (!project) {
+    throw new Error('Project not found!');
+  }
+
+	if (!areArraysEqual(project.mediaOrder, newMediaOrder)) return;
+
+  await prisma.project.update({
+		where: { id: projectId },
+		data: { mediaOrder: newMediaOrder }
+	});
 };
 
 export const deleteProject = async (id: string) => {

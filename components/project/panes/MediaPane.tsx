@@ -208,8 +208,8 @@ const MediaPane = ({
 		debouncedUpdateMedia({ mediaId, data: { duration: parseInt(e.target.value, 10) } });
 	};
 
-	const handleDescriptionChange = (mediaId: string) => (e: ChangeEvent<HTMLTextAreaElement>) => {
-		debouncedUpdateMedia({ mediaId, data: { description: e.target.value } });
+	const handleDescriptionChange = (mediaId: string) => (newDescription: string) => {
+		debouncedUpdateMedia({ mediaId, data: { description: newDescription } });
 	};
 
 	const handleTransitionChange = (mediaId: string) => (newTransition: TransitionType) => {
@@ -370,7 +370,7 @@ const MediaPane = ({
 											alt='...'
 											width={80}
 											height={80}
-											className='w-20 h-20 object-cover rounded-md cursor-grabbing'
+											className='w-20 h-20 object-cover rounded-md cursor-grabbing shadow-md'
 											src={mediaItems.find($ => $.id === activeId)?.url || '/images/placeholder.svg'}
 										/>
 									) : null}

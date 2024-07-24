@@ -55,7 +55,7 @@ const TransitionPicker = ({
 								transition === $.id && 'border-black hover:border-black bg-muted'
 							)}
 						>
-							<Image src={$.preview} className='aspect-[180/136] w-full h-auto rounded-md' width={100} height={100} alt={`${$.text} transition`} />
+							<Image src={$.preview} className='aspect-[180/136] w-full h-auto rounded-md' unoptimized width={100} height={100} alt={`${$.text} transition`} />
 							<span className='bg-black text-white mt-1 text-xs py-0.5 px-1.5 rounded text-nowrap'>{$.text}</span>
 						</button>
 					))}

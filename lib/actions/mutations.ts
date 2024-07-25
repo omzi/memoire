@@ -4,6 +4,7 @@ import prisma from '#/lib/prisma';
 import { MediaMetadata } from '#/types';
 import { Prisma } from '@prisma/client';
 import { areArraysEqual } from '#/lib/utils';
+import { edgestoreBackendClient } from '../edgestoreServer';
 
 export const createProject = async (data: Prisma.ProjectCreateInput) => {
   const project = await prisma.project.create({ data });
@@ -25,32 +26,44 @@ export const saveMedia = async ({
 		}
 	});
 	
-	await prisma.media.createMany({ data });
+	// Save media files & confirm their URLs
+	await Promise.all([
+		prisma.media.createMany({ data }),
+		...data.map(async ({ url }) => {
+      await edgestoreBackendClient.projectFiles.confirmUpload({ url });
+    })
+	]);
 
 	// Fetch current project's mediaOrder & all media
-	const [project, allMedia] = await Promise.all([
+	const [project, allMedia, narration] = await Promise.all([
     prisma.project.findUnique({
       where: { id: projectId },
-      select: { mediaOrder: true },
+      select: { mediaOrder: true }
     }),
-    prisma.media.findMany({
-      where: { projectId }
-    })
+    prisma.media.findMany({ where: { projectId } }),
+		prisma.narration.findUnique({ where: { projectId } })
   ]);
 
 	if (!project) {
     throw new Error('Project not found!');
-  }
+  };
 
-	const mediaOrder = allMedia.map(media => media.id);
-	const updatedMediaOrder = project.mediaOrder.length > 0 ? [...project.mediaOrder, ...mediaOrder] : mediaOrder;
+	// Extract IDs of newly added media
+  const newMediaIds = data.map(({ url }) => {
+    const media = allMedia.find(m => m.url === url);
+    return media?.id;
+  }).filter(id => id !== undefined) as string[];
+
+  // Combine old mediaOrder with newMediaIds, ensuring no duplicates
+  const existingMediaOrderSet = new Set(project.mediaOrder);
+  const updatedMediaOrder = [...project.mediaOrder, ...newMediaIds.filter(id => !existingMediaOrderSet.has(id))];
 
 	await prisma.project.update({
     where: { id: projectId },
     data: { mediaOrder: updatedMediaOrder }
   });
 
-  return { media: allMedia, mediaOrder: updatedMediaOrder };
+  return { media: allMedia, mediaOrder: updatedMediaOrder, narration: narration?.transcript ?? '' };
 };
 
 export const updateMedia = async ({

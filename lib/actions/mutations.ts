@@ -4,7 +4,7 @@ import prisma from '#/lib/prisma';
 import { MediaMetadata } from '#/types';
 import { Prisma } from '@prisma/client';
 import { areArraysEqual } from '#/lib/utils';
-import { edgestoreBackendClient } from '../edgestoreServer';
+import { edgestoreBackendClient } from '#/lib/edgestoreServer';
 
 export const createProject = async (data: Prisma.ProjectCreateInput) => {
   const project = await prisma.project.create({ data });
@@ -98,6 +98,31 @@ export const updateMedia = async ({
 	});
 
 	return updatedMedia;
+};
+
+export const deleteMedia = async ({ projectId, mediaId }: { projectId: string; mediaId: string }) => {
+	const [media, project] = await Promise.all([
+		prisma.media.findUnique({ where: { id: mediaId, projectId } }),
+		prisma.project.findUnique({ where: { id: projectId }, select: { mediaOrder: true } })
+	]);
+
+  if (!project) {
+    throw new Error('Project not found!');
+  }
+
+  if (!media || media.projectId !== projectId) {
+    throw new Error('Media not found!');
+  }
+	
+	const updatedMediaOrder = project.mediaOrder.filter(id => id !== mediaId);
+
+	await Promise.all([
+    edgestoreBackendClient.projectFiles.deleteFile({ url: media.url }),
+		prisma.media.delete({ where: { id: mediaId } }),
+		prisma.project.update({ where: { id: projectId }, data: { mediaOrder: updatedMediaOrder } })
+  ]);
+
+	return true;
 };
 
 export const saveMediaOrder = async ({

@@ -3,25 +3,25 @@
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { Prisma } from '@prisma/client';
-import { ImageIcon, SaveIcon } from 'lucide-react';
+import { SaveIcon } from 'lucide-react';
 import { useEdgeStore } from '#/lib/edgestore';
 import { Button } from '#/components/ui/button';
 import useExitPrompt from '#/hooks/useExitPrompt';
 import { useDebounceCallback } from 'usehooks-ts';
 import { Skeleton } from '#/components/ui/skeleton';
 import MediaItem from '#/components/project/MediaItem';
-import { getProjectMedia } from '#/lib/actions/queries';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { saveMedia, saveMediaOrder, updateMedia } from '#/lib/actions/mutations';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { getProjectMediaAndNarration } from '#/lib/actions/queries';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs';
+import { saveMedia, saveMediaOrder, updateMedia } from '#/lib/actions/mutations';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
 import { MultiFileDropzone, type FileState } from '#/components/MultiFileDropzone';
-import { cn, acceptedFileTypes, getPhotoDimensions, getVideoDimensions, reorderByField } from '#/lib/utils';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { ActivePane, MediaMetadata, MediaItemType, ProjectMediaType, TransitionType, UploadResult } from '#/types';
+import { ActivePane, MediaMetadata, MediaItemType, ProjectMediaType, TransitionType } from '#/types';
+import { cn, acceptedFileTypes, getPhotoDimensions, getVideoDimensions, reorderByField } from '#/lib/utils';
 import { DndContext, DragOverlay, DragEndEvent, PointerSensor, TouchSensor, closestCorners, useSensor, useSensors } from '@dnd-kit/core';
 
 const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10 MB
@@ -41,26 +41,24 @@ const MediaPane = ({
 	const queryClient = useQueryClient();
 	const tabBottomRef = useRef<HTMLDivElement>(null);
 	const [_, setShowExitPrompt] = useExitPrompt(false);
-	const [mediaIds, setMediaIds] = useState<string[]>([]);
 	const [isSaveDisabled, setIsSaveDisabled] = useState(true);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [fileStates, setFileStates] = useState<FileState[]>([]);
 	const [isUploadDisabled, setIsUploadDisabled] = useState(false);
 	const [mediaItems, setMediaItems] = useState<MediaItemType[]>([]);
-	const [uploadResults, setUploadResults] = useState<UploadResult[]>([]);
 	const [mediaMetadata, setMediaMetadata] = useState<MediaMetadata[]>([]);
 	const [mediaTab, setMediaTab] = useState<'upload' | 'manage'>('upload');
+	const [currentlyDeletingId, setCurrentlyDeletingId] = useState<string | null>(null);
 
-	const { isPending: projectMediaLoading, data: projectMedia, refetch } = useQuery({
+	const { isPending: projectMediaLoading, data: projectMedia } = useQuery({
 		queryKey: ['media'],
 		queryFn: async () => {
 			try {
-				const projectMedia = await getProjectMedia(projectId);
+				const projectMedia = await getProjectMediaAndNarration(projectId);
 
 				console.log('Project Media Query :>>', projectMedia);
 				const reorderedMediaItems = reorderByField(projectMedia.media, projectMedia.mediaOrder, 'id');
 				
-				setMediaIds(projectMedia.mediaOrder);
 				setMediaItems(reorderedMediaItems);
 				return projectMedia;
 			} catch (error) {
@@ -86,18 +84,10 @@ const MediaPane = ({
 			setShowExitPrompt(true);
 		},
 		onSuccess: async (data) => {
-			// Confirm Edgestore URLs
-			await Promise.all(
-				uploadResults.map(async ({ url }) => {
-					await edgestore.projectFiles.confirmUpload({ url });
-				})
-			);
-
 			queryClient.setQueryData<ProjectMediaType>(['media'], data);
 
 			const reorderedMediaItems = reorderByField(data.media, data.mediaOrder, 'id');
 
-			setMediaIds(data.mediaOrder);
 			setMediaItems(reorderedMediaItems);
 
 			// Switch to manage tab
@@ -106,7 +96,6 @@ const MediaPane = ({
 			setShowExitPrompt(false);
 			setIsUploadDisabled(false);
 			setFileStates([]);
-			setUploadResults([]);
 			setMediaMetadata([]);
 		},
 		onError: () => {
@@ -239,6 +228,18 @@ const MediaPane = ({
 		}
 	};
 
+	const onMediaDelete = (id: string) => {
+		setMediaItems(items => items.filter(item => item.id !== id));
+	};
+
+	const onStartMediaDelete = (id: string) => {
+		setCurrentlyDeletingId(id);
+	};
+
+	const clearCurrentlyDeletingId = () => {
+		setCurrentlyDeletingId(null);
+	};
+
 	const completedFiles = fileStates.filter(({ progress }) => typeof progress === 'number' && progress === 100 || progress === 'COMPLETE');
 
 	return (
@@ -252,7 +253,7 @@ const MediaPane = ({
 				title='Media'
 				description='Upload & manage your project media files.'
 			/>
-			<div className='p-3 flex-1 scrollbar-thin overflow-y-auto'>
+			<div className='p-3 flex-1 scrollbar-thin overflow-y-auto overflow-x-hidden'>
 				<Tabs defaultValue='upload' value={mediaTab} onValueChange={onMediaTabChange} className='w-full'>
 					<TabsList className='grid w-full grid-cols-2'>
 						<TabsTrigger value='upload'>Upload</TabsTrigger>
@@ -291,8 +292,6 @@ const MediaPane = ({
 												preview: addedFileState.preview,
 												file: addedFileState.file
 											};
-
-											setUploadResults(uploadResults => [...uploadResults, data]);
 
 											const size = addedFileState.type === 'PHOTO'
 												? await getPhotoDimensions(addedFileState.preview)
@@ -351,11 +350,17 @@ const MediaPane = ({
 								{mediaItems.length > 0 && mediaItems.map((media, idx, array) => (
 									<SortableContext
 										key={media.id}
+										disabled={media.id === currentlyDeletingId}
 										items={mediaItems}
 										strategy={verticalListSortingStrategy}
 									>
 										<MediaItem
+											projectId={projectId}
 											media={media}
+											onMediaDelete={onMediaDelete}
+											onStartMediaDelete={onStartMediaDelete}
+											isMediaBeingDeleted={!!currentlyDeletingId}
+											clearCurrentlyDeletingId={clearCurrentlyDeletingId}
 											mediaNumber={`${idx + 1}`.padStart(`${array.length}`.length, '0')}
 											handleDurationChange={handleDurationChange(media.id)}
 											handleDescriptionChange={handleDescriptionChange(media.id)}
@@ -366,7 +371,7 @@ const MediaPane = ({
 
 								<DragOverlay>
 									{activeId ? (
-										<Image
+										<img
 											alt='...'
 											width={80}
 											height={80}

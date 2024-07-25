@@ -1,7 +1,7 @@
 import { transitions } from '#/lib/utils';
 import { Prisma, $Enums } from '@prisma/client';
 import { type DefaultSession } from 'next-auth';
-import { getProjectMedia } from '#/lib/actions/queries';
+import { getProjectMediaAndNarration } from '#/lib/actions/queries';
 
 export type ExtendedUser = DefaultSession['user'] & {
   id: string;
@@ -37,5 +37,5 @@ export interface MediaMetadata extends UploadResult {
   type: $Enums.MediaType;
 };
 
-export type ProjectMediaType = Awaited<ReturnType<typeof getProjectMedia>>;
+export type ProjectMediaType = Awaited<ReturnType<typeof getProjectMediaAndNarration>>;
 export type TransitionType = typeof transitions[number]['id'];

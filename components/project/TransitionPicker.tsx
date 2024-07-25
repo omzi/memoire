@@ -10,12 +10,14 @@ import { Popover, PopoverTrigger, PopoverContent } from '#/components/ui/popover
 
 interface TransitionPickerProps {
 	mediaId: string;
+	disabled: boolean;
 	defaultTransition: TransitionType;
 	onChange: (newTransition: TransitionType) => void;
 };
 
 const TransitionPicker = ({
 	mediaId,
+	disabled,
 	onChange,
 	defaultTransition
 }: TransitionPickerProps) => {
@@ -32,13 +34,14 @@ const TransitionPicker = ({
 	};
 
 	const onOpenChange = (open: boolean) => {
+		if (disabled) return;
 		setIsOpen(open);
 	};
 	
 	return (
 		<Popover open={isOpen} onOpenChange={onOpenChange}>
 			<PopoverTrigger asChild>
-				<Button id={`transition-${mediaId}`} size='sm' className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
+				<Button disabled={disabled} id={`transition-${mediaId}`} size='sm' className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
 					<ArrowLeftRightIcon className='size-3.5 mr-1.5' />
 					{transitions.find($ => $.id === transition)!.text}
 				</Button>

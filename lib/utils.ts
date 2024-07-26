@@ -278,3 +278,25 @@ export const reorderByField = <T>(items: T[], sortedIds: any[], field: keyof T):
 
   return sortedIds.map(id => itemMap[id as unknown as string]).filter(Boolean);
 };
+
+export const voices = [
+  { id: 'echo', src: '/voices/echo', text: 'Echo' },
+  { id: 'alloy', src: '/voices/alloy', text: 'Alloy' },
+  { id: 'fable', src: '/voices/fable', text: 'Fable' },
+  { id: 'onyx', src: '/voices/onyx', text: 'Onyx' },
+  { id: 'nova', src: '/voices/nova', text: 'Nova' },
+  { id: 'shimmer', src: '/voices/shimmer', text: 'Shimmer' }
+] as const;
+
+export const aspectRatios = [
+  { ratio: '16:9', description: 'Widescreen (HD)' },
+  { ratio: '4:3', description: 'Standard (SD)' },
+  { ratio: '1:1', description: 'Square' },
+  { ratio: '21:9', description: 'Ultra-Widescreen' },
+  { ratio: '3:2', description: 'Classic' },
+  { ratio: '9:16', description: 'Portrait' },
+  { ratio: '2.35:1', description: 'Cinematic' },
+  { ratio: '5:4', description: 'Older Monitors' },
+  { ratio: '1.85:1', description: 'Widescreen Cinema' },
+  { ratio: '2:3', description: 'Medium Format Photography' }
+];

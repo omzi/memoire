@@ -26,3 +26,16 @@ export const AuthSchema = z.object({
 		.refine(value => value && value.length >= 2, 'Last name must be at least 2 characters.')
 		.refine(value => value && value.length <= 30, 'Last name must not be more than 30 characters.')
 });
+
+export const NarrationMediaItem = z.object({
+	id: z.string(),
+	type: z.enum(['VIDEO', 'PHOTO']),
+	text: z.string()
+});
+
+export const NarrationGenerationSchema = z.object({
+	title: z.string(),
+  deescription: z.string(),
+  hashtags: z.array(z.string()),
+  mediaItems: z.array(NarrationMediaItem)
+});

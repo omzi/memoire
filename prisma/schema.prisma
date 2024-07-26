@@ -94,6 +94,8 @@ model Project {
   isStarred      Boolean     @default(false)
   needsNarration Boolean     @default(true)
   needsMusic     Boolean     @default(true)
+  aspectRatio    String      @default("16:9")
+  frameRate      Int         @default(30) // 24, 30 & 60
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   userId         String      @db.ObjectId
@@ -133,6 +135,7 @@ model MusicTrack {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   url       String
   prompt    String
+  vibe      String
   createdAt DateTime @default(now())
   projectId String   @db.ObjectId
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)

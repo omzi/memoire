@@ -32,8 +32,9 @@ const ProjectEditor = ({
 				projectId={projectId}
 				activePane={activePane}
 				onPaneChange={onPaneChange}
-			/>
+				/>
 			<NarrationPane
+				projectId={projectId}
 				activePane={activePane}
 				onPaneChange={onPaneChange}
 			/>

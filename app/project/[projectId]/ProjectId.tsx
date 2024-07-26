@@ -2,11 +2,9 @@
 
 import { useEffect } from 'react';
 import { ProjectType } from '#/types';
-import { toast } from 'react-toastify';
 import { Navbar } from '#/components/project/NavBar';
+import { useMutationState } from '@tanstack/react-query';
 import ProjectEditor from '#/components/project/ProjectEditor';
-import { useMutationState, useQuery } from '@tanstack/react-query';
-import { getProjectByProjectAndUserId } from '#/lib/actions/queries';
 
 interface ProjectIdProps {
 	initialData: ProjectType;
@@ -27,21 +25,6 @@ const ProjectId = ({
 		select: (mutation) => mutation.state.data
 	});
 	const currentData = data[data.length - 1] as ProjectType | undefined;
-	const { isPending: getProjectLoading, data: project, refetch } = useQuery({
-		queryKey: [`project-${initialData.id}`],
-		queryFn: async () => {
-			try {
-				const project = await getProjectByProjectAndUserId(initialData.userId, params.projectId) as ProjectType;
-
-				console.log('Get Project Query :>>', project);
-				return project;
-			} catch (error) {
-				toast.error('Failed to fetch project ;(');
-				throw error;
-			}
-		},
-		initialData
-	});
 
 	useEffect(() => {
 		if (currentData && currentData.title) {

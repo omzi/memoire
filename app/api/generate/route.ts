@@ -3,9 +3,7 @@ import { google } from '@ai-sdk/google';
 import { type CoreMessage, streamText } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
 export const maxDuration = 30;
-export const dynamic = 'force-dynamic';
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
   const isRateLimited = await rateLimit(req, res);
@@ -29,7 +27,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
   const messages = [
     {
       role: 'system',
-      content: `You are a ${mediaType} description expert. Conduct an in-depth analysis of the uploaded ${mediaType}, exploring its creative background, emotional expression, the story behind the work, and its meanings. Send it as a summary of not more than ${mediaType === 'photo' ? 75 : 150} words & 400 characters. DO NOT send a response outside what you're told to send. Regardless of the language the user uses, always stick to English in your description. ${context}`
+      content: `You are a ${mediaType} description expert. Conduct an in-depth analysis of the uploaded ${mediaType}, exploring its creative background, emotional expression, the story behind the work, and its meanings. Send it as a summary of not more than ${mediaType === 'photo' ? 75 : 150} words & 400 characters. ${mediaType === 'video' && 'The description should also contain anything important said or inferred in the video.'} DO NOT send a response outside what you're told to send. Regardless of the language the user uses, always stick to English in your description. ${context}`
     },
     {
       role: 'user',

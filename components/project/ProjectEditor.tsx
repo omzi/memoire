@@ -43,6 +43,7 @@ const ProjectEditor = ({
 				onPaneChange={onPaneChange}
 			/>
 			<SettingsPane
+				projectId={projectId}
 				activePane={activePane}
 				onPaneChange={onPaneChange}
 			/>

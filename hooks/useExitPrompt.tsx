@@ -14,7 +14,6 @@ const initBeforeUnLoad = (showExitPrompt: boolean) => {
 	};
 };
 
-
 const useExitPrompt = (defaultState: boolean): [boolean, Dispatch<SetStateAction<boolean>>] => {
 	const [showExitPrompt, setShowExitPrompt] = useState(defaultState);
 

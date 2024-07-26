@@ -5,16 +5,15 @@ import { Label } from '#/components/ui/label';
 import { Button } from '#/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { Textarea } from '#/components/ui/textarea';
-import { useCompletion } from '#/hooks/useCompletion';
 import { cn, reorderByField, voices } from '#/lib/utils';
 import { ActivePane, MediaItemType, Voice } from '#/types';
+import { NarrationGenerationSchema } from '#/lib/validations';
 import { getProjectMediaAndNarration } from '#/lib/actions/queries';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
-import { ChangeEvent, FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
+import { ChangeEvent, FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { SquareIcon, SparklesIcon, ChevronDownIcon, MicIcon, PlayIcon, PauseIcon, BoltIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '#/components/ui/dropdown-menu';
-import { NarrationGenerationSchema, NarrationMediaItem } from '#/lib/validations';
 
 interface NarrationPaneProps {
 	projectId: string;

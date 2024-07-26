@@ -23,6 +23,17 @@ export const getProjectByProjectAndUserId = async (userId: string, projectId: st
   return project;
 };
 
+export const getProjectSettingsById = async (projectId: string) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { description: true, aspectRatio: true, frameRate: true }
+  });
+
+	if (!project) throw new Error('Project not found!');
+
+  return project;
+};
+
 export const getProjectTitle = async (projectId: string) => {
   const project = await prisma.project.findUnique({
     where: { id: projectId }

@@ -202,3 +202,29 @@ export const unstarProject = async (id: string) => {
 
   return project;
 };
+
+export const updateProjectSettings = async (projectId: string, data: Prisma.ProjectUpdateInput) => {
+	const project = await prisma.project.findUnique({
+    where: { id: projectId }
+  });
+
+  if (!project) {
+    throw new Error('Project not found!');
+  }
+
+	// Ensure non-allowed fields are not changed
+	const allowedFields = ['description', 'aspectRatio', 'frameRate'] as (keyof Prisma.ProjectUpdateInput)[];
+
+	for (const field in data) {
+		if (!allowedFields.includes(field as keyof Prisma.ProjectUpdateInput)) {
+			delete data[field as keyof Prisma.ProjectUpdateInput];
+		}
+	}
+
+	const updatedProject = await prisma.project.update({
+		where: { id: projectId },
+		data
+	});
+
+	return updatedProject;
+};

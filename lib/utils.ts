@@ -299,4 +299,10 @@ export const aspectRatios = [
   { ratio: '5:4', description: 'Older Monitors' },
   { ratio: '1.85:1', description: 'Widescreen Cinema' },
   { ratio: '2:3', description: 'Medium Format Photography' }
-];
+] as const;
+
+export const frameRates = [
+  { value: 24, text: '24 FPS' },
+  { value: 30, text: '30 FPS' },
+  { value: 60, text: '60 FPS' }
+] as const;

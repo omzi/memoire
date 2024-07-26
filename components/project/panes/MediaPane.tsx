@@ -48,7 +48,6 @@ const MediaPane = ({
 	const [mediaItems, setMediaItems] = useState<MediaItemType[]>([]);
 	const [mediaMetadata, setMediaMetadata] = useState<MediaMetadata[]>([]);
 	const [mediaTab, setMediaTab] = useState<'upload' | 'manage'>('upload');
-	const [currentlyDeletingId, setCurrentlyDeletingId] = useState<string | null>(null);
 
 	const { isPending: projectMediaLoading, data: projectMedia } = useQuery({
 		queryKey: ['media'],
@@ -232,14 +231,6 @@ const MediaPane = ({
 		setMediaItems(items => items.filter(item => item.id !== id));
 	};
 
-	const onStartMediaDelete = (id: string) => {
-		setCurrentlyDeletingId(id);
-	};
-
-	const clearCurrentlyDeletingId = () => {
-		setCurrentlyDeletingId(null);
-	};
-
 	const completedFiles = fileStates.filter(({ progress }) => typeof progress === 'number' && progress === 100 || progress === 'COMPLETE');
 
 	return (
@@ -350,7 +341,6 @@ const MediaPane = ({
 								{mediaItems.length > 0 && mediaItems.map((media, idx, array) => (
 									<SortableContext
 										key={media.id}
-										disabled={media.id === currentlyDeletingId}
 										items={mediaItems}
 										strategy={verticalListSortingStrategy}
 									>
@@ -358,9 +348,6 @@ const MediaPane = ({
 											projectId={projectId}
 											media={media}
 											onMediaDelete={onMediaDelete}
-											onStartMediaDelete={onStartMediaDelete}
-											isMediaBeingDeleted={!!currentlyDeletingId}
-											clearCurrentlyDeletingId={clearCurrentlyDeletingId}
 											mediaNumber={`${idx + 1}`.padStart(`${array.length}`.length, '0')}
 											handleDurationChange={handleDurationChange(media.id)}
 											handleDescriptionChange={handleDescriptionChange(media.id)}

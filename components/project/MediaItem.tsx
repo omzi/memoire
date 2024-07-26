@@ -14,17 +14,14 @@ import { useCompletion } from '#/hooks/useCompletion';
 import { MediaItemType, TransitionType } from '#/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
 import TransitionPicker from '#/components/project/TransitionPicker';
 import { GripVerticalIcon, ImageIcon, Loader, SparklesIcon, SquareIcon, Trash2Icon, VideoIcon } from 'lucide-react';
 
 interface MediaItemProps {
 	projectId: string;
 	media: MediaItemType;
-	isMediaBeingDeleted: boolean;
 	onMediaDelete: (id: string) => void;
-	onStartMediaDelete: (id: string) => void;
-	clearCurrentlyDeletingId: () => void;
 	mediaNumber: string;
 	handleDurationChange: (e: ChangeEvent<HTMLInputElement>) => void;
 	handleDescriptionChange: (newDescription: string) => void;
@@ -34,15 +31,16 @@ interface MediaItemProps {
 const MediaItem = ({
 	projectId,
 	media,
-	isMediaBeingDeleted,
 	onMediaDelete,
-	onStartMediaDelete,
-	clearCurrentlyDeletingId,
 	mediaNumber,
 	handleDurationChange,
 	handleDescriptionChange,
 	handleTransitionChange
 }: MediaItemProps) => {
+	const isMediaMutating = Boolean(useIsMutating({
+		mutationKey: [`project-${projectId}`],
+		exact: true
+	}));
 	const queryClient = useQueryClient();
 	const [visible, setVisible] = useState(true);
 	const [description, setDescription] = useState('');
@@ -62,9 +60,6 @@ const MediaItem = ({
 			setVisible(false);
 
 			queryClient.invalidateQueries({ queryKey: ['media'] });
-		},
-		onError() {
-			clearCurrentlyDeletingId();
 		}
 	});
 
@@ -100,10 +95,9 @@ const MediaItem = ({
 	};
 
 	const handleDelete = () => {
-		if (isMediaBeingDeleted) return;
-
+		if (isMediaMutating) return;
+		
 		stop();
-		onStartMediaDelete(media.id);
 		deleteMediaMutation(media.id);
 	};
 
@@ -118,7 +112,10 @@ const MediaItem = ({
 			{visible && (
 				<motion.div className='border-b bg-white touch-none' exit={exitAnimation} ref={setNodeRef} style={style}>
 					<div className='flex flex-1 items-center justify-between py-3.5 font-medium'>
-						<GripVerticalIcon {...attributes} {...listeners} className={cn('cursor-grab mr-1 text-muted-foreground', isDeleting && 'opacity-50 cursor-not-allowed pointer-events-none')} />
+						<GripVerticalIcon
+							{...attributes} {...listeners}
+							className={cn('cursor-grab mr-1 text-muted-foreground', isDeleting && 'opacity-50 cursor-not-allowed pointer-events-none')}
+						/>
 						<div className='mr-2'>{media.type === 'PHOTO' ? <ImageIcon /> : <VideoIcon />}</div>
 						<h6 className='flex-1 text-left select-none'>
 							Media #{mediaNumber}
@@ -127,7 +124,7 @@ const MediaItem = ({
 						{isDeleting ? (
 							<Loader className='animate-spin text-muted-foreground' />
 						): (
-							<Trash2Icon onClick={handleDelete} className={cn('text-red-500 cursor-pointer', isMediaBeingDeleted && 'opacity-50 cursor-not-allowed pointer-events-none')} />
+							<Trash2Icon onClick={handleDelete} className={cn('text-red-500 cursor-pointer', isMediaMutating && 'opacity-50 cursor-not-allowed pointer-events-none')} />
 						)}
 					</div>
 					<div className='flex gap-x-2 pb-4'>

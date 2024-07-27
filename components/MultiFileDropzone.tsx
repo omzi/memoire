@@ -2,8 +2,8 @@
 
 import {
 	CheckCircleIcon,
-  FileIcon,
-  LucideFileWarning,
+  FilmIcon,
+  FileWarningIcon,
   Trash2Icon,
   UploadCloudIcon
 } from 'lucide-react';
@@ -90,7 +90,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
             key: Math.random().toString(36).slice(2),
             type: file.type && file.type.startsWith('image/') ? 'PHOTO' : 'VIDEO',
             progress: 'PENDING',
-            preview: file.type && file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
+            preview: URL.createObjectURL(file)
           }));
           void onFilesAdded?.(addedFiles);
           void onChange?.([...(value ?? []), ...addedFiles]);
@@ -176,7 +176,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                   <img src={preview} className='object-cover h-full w-full rounded' />
                 </div>
               ): (
-                <FileIcon size='48' className='shrink-0 stroke-1 p-2.5' />
+                <FilmIcon size='48' className='shrink-0 stroke-1 p-2.5' />
               )}
 
               <div className='flex-1 flex flex-col overflow-hidden'>
@@ -203,7 +203,7 @@ const MultiFileDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                         <Trash2Icon className='shrink-0' />
                       </button>
                     ) : progress === 'ERROR' ? (
-                      <LucideFileWarning className='text-red-600 shrink-0 dark:text-red-400' />
+                      <FileWarningIcon className='text-red-600 shrink-0 dark:text-red-400' />
                     ) : progress !== 'COMPLETE' ? (
                       <div>{Math.round(progress)}%</div>
                     ) : (

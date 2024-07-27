@@ -128,11 +128,11 @@ export const acceptedFileTypes = {
   'image/jpeg': ['.jpeg'],
   'image/webp': ['.webp'],
   'image/tiff': ['.tiff'],
-  'video/mp4': ['.mp4'],
-  'video/x-msvideo': ['.avi'],
-  'video/x-matroska': ['.mkv'],
-  'video/quicktime': ['.mov'],
-  'video/webm': ['.webm']
+  // 'video/mp4': ['.mp4'],
+  // 'video/x-msvideo': ['.avi'],
+  // 'video/x-matroska': ['.mkv'],
+  // 'video/quicktime': ['.mov'],
+  // 'video/webm': ['.webm']
 };
 
 export const getPhotoDimensions = (dataURI: string): Promise<{ width: number; height: number }> => {

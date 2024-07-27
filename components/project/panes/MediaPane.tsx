@@ -21,7 +21,7 @@ import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton'
 import { MultiFileDropzone, type FileState } from '#/components/MultiFileDropzone';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ActivePane, MediaMetadata, MediaItemType, ProjectMediaType, TransitionType } from '#/types';
-import { cn, acceptedFileTypes, getPhotoDimensions, getVideoDimensions, reorderByField } from '#/lib/utils';
+import { cn, acceptedFileTypes, reorderByField, getPhotoDimensions, getVideoDimensions } from '#/lib/utils';
 import { DndContext, DragOverlay, DragEndEvent, PointerSensor, TouchSensor, closestCorners, useSensor, useSensors } from '@dnd-kit/core';
 
 const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10 MB
@@ -55,7 +55,6 @@ const MediaPane = ({
 			try {
 				const projectMedia = await getProjectMediaAndNarration(projectId);
 
-				console.log('Project Media Query :>>', projectMedia);
 				const reorderedMediaItems = reorderByField(projectMedia.media, projectMedia.mediaOrder, 'id');
 				
 				setMediaItems(reorderedMediaItems);
@@ -278,16 +277,10 @@ const MediaPane = ({
 												}
 											});
 
-											const data = {
-												url: fileResponse.url,
-												preview: addedFileState.preview,
-												file: addedFileState.file
-											};
-
-											const size = addedFileState.type === 'PHOTO'
+											const data = addedFileState.type === 'PHOTO'
 												? await getPhotoDimensions(addedFileState.preview)
 												: await getVideoDimensions(addedFileState.preview);
-											const metadata = { ...size, url: fileResponse.url, type: addedFileState.type };
+											const metadata = { ...data, url: fileResponse.url, type: addedFileState.type };
 											setMediaMetadata(mediaMetadata => [...mediaMetadata, metadata]);
 										} catch (error) {
 											updateFileProgress(addedFileState.key, 'ERROR');
@@ -358,7 +351,7 @@ const MediaPane = ({
 
 								<DragOverlay>
 									{activeId ? (
-										<img
+										<Image
 											alt='...'
 											width={80}
 											height={80}

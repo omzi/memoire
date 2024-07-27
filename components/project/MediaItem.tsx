@@ -142,6 +142,8 @@ const MediaItem = ({
 									className={cn('w-16 h-auto object-cover rounded-md cursor-pointer select-none', isDeleting && 'cursor-not-allowed')}
 								/>
 						}
+						{/* Preload drag thumbnail */}
+						<Image alt='...' width={80} height={80} className='w-20 h-20 hidden' src={media.url} />
 						<div className='flex flex-col flex-1 gap-y-2 mr-px'>
 							<div className='space-y-1'>
 								<Label htmlFor='duration'>Duration</Label>

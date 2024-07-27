@@ -42,7 +42,6 @@ const NarrationPane = ({
 			try {
 				const projectMedia = await getProjectMediaAndNarration(projectId);
 
-				console.log('Project Media Query [Narration]:>>', projectMedia);
 				const reorderedMediaItems = reorderByField(projectMedia.media, projectMedia.mediaOrder, 'id');
 
 				setMediaItems(reorderedMediaItems);

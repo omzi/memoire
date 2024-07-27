@@ -3,13 +3,14 @@
 import { toast } from 'react-toastify';
 import { Prisma } from '@prisma/client';
 import { cn, voices } from '#/lib/utils';
-import { ActivePane, NarrationType, Voice } from '#/types';
 import { Label } from '#/components/ui/label';
 import { Button } from '#/components/ui/button';
 import { useDebounceCallback } from 'usehooks-ts';
 import { Textarea } from '#/components/ui/textarea';
 import { Skeleton } from '#/components/ui/skeleton';
+import usePreviousValue from '#/hooks/usePreviousValue';
 import { updateNarration } from '#/lib/actions/mutations';
+import { ActivePane, NarrationType, Voice } from '#/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { NarrationGenerationSchema } from '#/lib/validations';
 import { getProjectMediaAndNarration } from '#/lib/actions/queries';
@@ -18,7 +19,6 @@ import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton'
 import { ChangeEvent, FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { SquareIcon, SparklesIcon, ChevronDownIcon, MicIcon, PlayIcon, PauseIcon, PodcastIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '#/components/ui/dropdown-menu';
-import axios from 'axios';
 
 interface NarrationPaneProps {
 	projectId: string;
@@ -35,9 +35,11 @@ const NarrationPane = ({
 	const [narration, setNarration] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const voiceRef = useRef<HTMLAudioElement | null>(null);
+	const [isVoiceSelectOpen, setIsVoiceSelectOpen] = useState(false);
 	const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 	const [playingVoice, setPlayingVoice] = useState<Voice | null>(null);
 	const [selectedVoice, setSelectedVoice] = useState<Voice | null>(null);
+	const previousVoice = usePreviousValue(selectedVoice);
 	const [fetchedVoices, setFetchedVoices] = useState<Map<string, string>>(new Map());
 	const [abortController, setAbortController] = useState<AbortController | null>(null);
 
@@ -160,11 +162,16 @@ const NarrationPane = ({
 	};
 
 	const handleVoiceSelect = (voice: Voice) => {
-		setSelectedVoice(voice);
-
-		if (narration) {
+		if (previousVoice !== voice && narration) {
+			setSelectedVoice(voice);
 			debouncedUpdateNarration({ voice });
 		}
+
+		setIsVoiceSelectOpen(false);
+	};
+
+	const onVoiceSelectOpenChange = (open: boolean) => {
+		setIsVoiceSelectOpen(open);
 	};
 
 	const handleVoicePreviewClick = (e: MouseEvent<HTMLButtonElement>, voice: Voice) => {
@@ -214,6 +221,8 @@ const NarrationPane = ({
 		fetchVoices();
 	}, []);
 
+	const isDisabled = projectNarrationLoading || isLoading || !narration || isGeneratingAudio;
+
 	return (
 		<aside
 			className={cn(
@@ -256,7 +265,7 @@ const NarrationPane = ({
 										Stop generation
 									</Button>
 								) : (
-									<Button size='sm' type='submit' disabled={projectNarrationLoading} className='bg-core hover:bg-black text-white text-xs w-max h-7 px-2'>
+									<Button size='sm' type='submit' disabled={isDisabled} className='bg-core hover:bg-black text-white text-xs w-max h-7 px-2'>
 										<SparklesIcon className='size-3.5 mr-1.5' />
 										Generate with AI
 									</Button>
@@ -268,7 +277,7 @@ const NarrationPane = ({
 								onChange={handleNarrationChange}
 								maxLength={1500}
 								className='p-2 h-40 resize-none scrollbar-thin'
-								disabled={projectNarrationLoading || isLoading || !narration}
+								disabled={isDisabled}
 								placeholder={`Please click the button above to ${narration.length > 0 ? 're' : ''}generate your transcript`}
 							/>
 							<span className='text-xs text-muted-foreground absolute right-0 -bottom-5 select-none'>{narration.length}/1500</span>
@@ -277,8 +286,8 @@ const NarrationPane = ({
 						<div className='space-y-1'>
 							<Label htmlFor='voice'>Voice</Label>
 							<audio ref={voiceRef} className='sr-only' />
-							<DropdownMenu>
-								<DropdownMenuTrigger disabled={fetchedVoices.size !== voices.length || projectNarrationLoading || isLoading || !narration} asChild>
+							<DropdownMenu open={isVoiceSelectOpen} onOpenChange={onVoiceSelectOpenChange}>
+								<DropdownMenuTrigger disabled={fetchedVoices.size !== voices.length || isDisabled} asChild>
 									<Button id='voice' variant='outline' className='w-full flex items-center justify-between px-2 [&[data-state=open]>svg]:rotate-180'>
 										<div className='flex items-center gap-y-1'>
 											<MicIcon className='w-4 h-4 mr-2' />
@@ -316,7 +325,7 @@ const NarrationPane = ({
 									Cancel generation
 								</Button>
 							) : (
-								<Button onClick={handleAudioGeneration} size='sm' disabled={projectNarrationLoading} className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
+								<Button onClick={handleAudioGeneration} size='sm' disabled={isDisabled} className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
 									<PodcastIcon className='size-3.5 mr-1.5' />
 									Generate narration
 								</Button>

@@ -6,15 +6,15 @@ import ComingSoonSection from '#/components/ComingSoonSection';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
 
-interface MusicPaneProps {
+interface SubtitlePaneProps {
 	activePane: ActivePane;
 	onPaneChange: (pane: ActivePane) => void;
 };
 
-const MusicPane = ({
+const SubtitlePane = ({
 	activePane,
 	onPaneChange
-}: MusicPaneProps) => {
+}: SubtitlePaneProps) => {
 	const onClose = () => {
 		onPaneChange(null);
 	};
@@ -23,19 +23,19 @@ const MusicPane = ({
 		<aside
 			className={cn(
 				'bg-white relative border-r z-20 w-[360px] h-full flex flex-col',
-				activePane === 'music' ? 'visible' : 'hidden'
+				activePane === 'subtitle' ? 'visible' : 'hidden'
 			)}
 		>
 			<SidebarPaneHeader
-				title='Music'
-				description='Generate background music for your project with AI.'
+				title='Subtitle'
+				description='Generate narration subtitle for your project with AI.'
 			/>
 			<div className='p-3 flex-1 scrollbar-thin overflow-y-auto overflow-x-hidden'>
 				<ComingSoonSection isHome={false} />
 			</div>
-			<SidebarPaneCloseButton pane='music' activePane={activePane} onClick={onClose} />
+			<SidebarPaneCloseButton pane='subtitle' activePane={activePane} onClick={onClose} />
 		</aside>
 	);
 };
 
-export default MusicPane;
+export default SubtitlePane;

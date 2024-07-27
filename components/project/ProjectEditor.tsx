@@ -7,6 +7,7 @@ import Sidebar from '#/components/project/Sidebar';
 import MediaPane from '#/components/project/panes/MediaPane';
 import MusicPane from '#/components/project/panes/MusicPane';
 import SettingsPane from '#/components/project/panes/SettingsPane';
+import SubtitlePane from '#/components/project/panes/SubtitlePane';
 import NarrationPane from '#/components/project/panes/NarrationPane';
 
 interface ProjectEditorProps {
@@ -39,6 +40,10 @@ const ProjectEditor = ({
 				onPaneChange={onPaneChange}
 			/>
 			<MusicPane
+				activePane={activePane}
+				onPaneChange={onPaneChange}
+			/>
+			<SubtitlePane
 				activePane={activePane}
 				onPaneChange={onPaneChange}
 			/>

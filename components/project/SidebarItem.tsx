@@ -21,7 +21,7 @@ const SidebarItem = ({
 			onClick={onClick}
 			className={cn(
 				'w-full h-full aspect-video px-3 py-2 flex flex-col rounded-lg duration-150',
-				isActive && 'bg-core text-white hover:bg-core hover:text-white'
+				isActive && 'bg-core text-white hover:bg-core hover:text-white shadow-md'
 			)}
 		>
 			<Icon className='size-6 stroke-[1.5] shrink-0' />

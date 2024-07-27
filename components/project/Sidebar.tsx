@@ -4,7 +4,8 @@ import {
 	MicIcon,
 	MusicIcon,
 	SettingsIcon,
-	ImagePlusIcon
+	ImagePlusIcon,
+	SubtitlesIcon
 } from 'lucide-react';
 import { ActivePane } from '#/types';
 import SidebarItem from '#/components/project/SidebarItem';
@@ -38,6 +39,12 @@ const Sidebar = ({
 					label='Music'
 					isActive={activePane === 'music'}
 					onClick={() => onPaneChange('music')}
+				/>
+				<SidebarItem
+					icon={SubtitlesIcon}
+					label='Subtitle'
+					isActive={activePane === 'subtitle'}
+					onClick={() => onPaneChange('subtitle')}
 				/>
 				<SidebarItem
 					icon={SettingsIcon}

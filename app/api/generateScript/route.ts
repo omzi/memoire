@@ -34,6 +34,9 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
   if (!project) {
 		return new Response('Project not found!', { status: 400 });
 	}
+  if (!project.description) {
+		return new Response('Project description not found!', { status: 400 });
+	}
   if (media.length === 0) {
 		return new Response('No media uploaded yet!', { status: 400 });
 	}
@@ -48,10 +51,11 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 			id: $.id,
 			type: $.type,
 			description: $.description,
-			transition: $.transition,
 			duration: $.duration
 		}
 	});
+
+  console.log('formattedMedia :>>', formattedMedia);
 	
   const model = google('models/gemini-1.5-pro-latest', {
 		safetySettings: [
@@ -75,7 +79,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 	});
 
 	const prompt = `You are an event video scriptwriter.
-Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided array of objects.
+Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items.
 
 Specifics:
 1. Narrate each item using details like place, date, time, and description in a story format, using first-person and past tense.
@@ -84,7 +88,7 @@ Specifics:
 4. Ensure the narration covers all items once, with video narrations tailored to not exceed their duration.
 5. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
 
-Respond in JSON only using the format below:
+Output JSON only in the format like in the example below:
 
 {
   "title": "Our Grand Canyon Adventure",
@@ -124,7 +128,9 @@ Respond in JSON only using the format below:
   ]
 }
 
-Here's the array: ${formattedMedia}`;
+Here's the project description: ${project.description}
+
+Here are the media items: ${formattedMedia}`;
 
   const result = await generateObject({
     model,

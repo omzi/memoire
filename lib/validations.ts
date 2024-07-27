@@ -35,7 +35,7 @@ export const NarrationMediaItem = z.object({
 
 export const NarrationGenerationSchema = z.object({
 	title: z.string(),
-  deescription: z.string(),
+  description: z.string(),
   hashtags: z.array(z.string()),
   mediaItems: z.array(NarrationMediaItem)
 });

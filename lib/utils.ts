@@ -306,3 +306,9 @@ export const frameRates = [
   { value: 30, text: '30 FPS' },
   { value: 60, text: '60 FPS' }
 ] as const;
+
+export const wordsInSeconds = (seconds: number, wordsPerMinute = 182) => {
+  const wordsPerSecond = wordsPerMinute / 60;
+
+  return Math.floor(seconds * wordsPerSecond);
+};

@@ -3,7 +3,7 @@
 import { toast } from 'react-toastify';
 import { Prisma } from '@prisma/client';
 import { cn, voices } from '#/lib/utils';
-import { ActivePane, Voice } from '#/types';
+import { ActivePane, NarrationType, Voice } from '#/types';
 import { Label } from '#/components/ui/label';
 import { Button } from '#/components/ui/button';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -18,6 +18,7 @@ import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton'
 import { ChangeEvent, FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { SquareIcon, SparklesIcon, ChevronDownIcon, MicIcon, PlayIcon, PauseIcon, PodcastIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '#/components/ui/dropdown-menu';
+import axios from 'axios';
 
 interface NarrationPaneProps {
 	projectId: string;
@@ -34,6 +35,7 @@ const NarrationPane = ({
 	const [narration, setNarration] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const voiceRef = useRef<HTMLAudioElement | null>(null);
+	const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 	const [playingVoice, setPlayingVoice] = useState<Voice | null>(null);
 	const [selectedVoice, setSelectedVoice] = useState<Voice | null>(null);
 	const [fetchedVoices, setFetchedVoices] = useState<Map<string, string>>(new Map());
@@ -122,6 +124,33 @@ const NarrationPane = ({
 		}
 	};
 
+	const handleAudioGeneration = async () => {
+		const controller = new AbortController();
+		setAbortController(controller);
+		setIsGeneratingAudio(true);
+
+		try {
+			const response = await fetch('/api/generateNarration', {
+				method: 'POST',
+				body: JSON.stringify({ projectId }),
+				signal: controller.signal
+			});
+
+			if (!response.ok) {
+				return toast.error(await response.text());
+			}
+
+			const result = await response.json() as { message: string; data: NarrationType };
+			setAudioUrl(result.data.audioUrl as string);
+
+			console.log('Audio Generation Data :>>', result);
+		} catch (error: any) {
+			toast.error(error.message);
+		} finally {
+			setIsGeneratingAudio(false);
+		}
+	};
+
 	const handleNarrationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
 		if (narration) {
 			debouncedUpdateNarration({ transcript: e.target.value });
@@ -194,7 +223,7 @@ const NarrationPane = ({
 		>
 			<SidebarPaneHeader
 				title='Narration'
-				description='Create, reviews & update the AI-generated narration.'
+				description='Create, review & update the AI-generated narration.'
 			/>
 				<div className='p-3 flex-1 scrollbar-thin overflow-y-auto overflow-x-hidden'>
 					<div className={cn('flex flex-col flex-1 gap-y-2 mr-px', !projectNarrationLoading && 'hidden')}>
@@ -210,7 +239,7 @@ const NarrationPane = ({
 						</div>
 
 						<div className='mx-auto'>
-							<Skeleton className='w-40 mt-1 h-9 rounded-md' />
+							<Skeleton className='w-40 mt-1 h-7 rounded-md' />
 						</div>
 
 						<div className='space-y-1.5'>
@@ -281,14 +310,20 @@ const NarrationPane = ({
 						</div>
 
 						<div className='mx-auto'>
-							<Button size='sm' className='bg-black hover:bg-core text-white'>
-								<PodcastIcon className='size-4 mr-2' />
-								Generate Narration
-							</Button>
+							{isGeneratingAudio ? (
+								<Button size='sm' variant='outline' onClick={stopGeneration} className='bg-red-200 hover:bg-red-600 text-red-600 hover:text-white border-red-600 text-xs w-max h-7 px-2'>
+									<SquareIcon className='size-3.5 mr-1.5' />
+									Cancel generation
+								</Button>
+							) : (
+								<Button onClick={handleAudioGeneration} size='sm' disabled={projectNarrationLoading} className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
+									<PodcastIcon className='size-3.5 mr-1.5' />
+									Generate narration
+								</Button>
+							)}
 						</div>
 
-						<audio className='w-full' controls>
-							<source src={audioUrl} type='audio/mpeg' />
+						<audio src={audioUrl} className='w-full' controls>
 							Your browser does not support the audio element.
 						</audio>
 					</div>

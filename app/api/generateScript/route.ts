@@ -3,6 +3,7 @@ import { generateObject } from 'ai';
 import { Redis } from '@upstash/redis';
 import { google } from '@ai-sdk/google';
 import { getToken } from 'next-auth/jwt';
+import { wordsInSeconds } from '#/lib/utils';
 import { Ratelimit } from '@upstash/ratelimit';
 import { NextRequest, NextResponse } from 'next/server';
 import { NarrationGenerationSchema } from '#/lib/validations';
@@ -52,11 +53,12 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 			id: $.id,
 			type: $.type,
 			description: $.description,
-			duration: $.duration
+			duration: $.duration,
+      scriptWordCount: wordsInSeconds($.duration, 182)
 		}
 	});
-
-  console.log('formattedMedia :>>', formattedMedia);
+  
+  const totalSeconds = media.reduce((total, item) => total + item.duration, 0);
 	
   const model = google('models/gemini-1.5-pro-latest', {
 		safetySettings: [
@@ -80,15 +82,15 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 	});
 
 	const prompt = `You are an event video scriptwriter.
-Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items (containing the ID, the type of media, the duration it's narration should be & the description of the media).
+Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items (containing the ID, the type of media, the duration it's narration should be, the description of the media, and the EXACT word count of the script you'll generate for the media).
 
-Specifics:
+Instructions:
 1. Narrate each item using details like place, date, time, and description in a story format, using first-person and past tense.
 2. The script should mimic a casual storytelling session, as if explaining the trip to friends or family.
 3. Infer logical placements for media items lacking complete information, ensuring continuity and context without guessing.
-4. Ensure the narration covers all items once, with ALL media narrations tailored to meet their duration.
-5. Ensure that each & every media narration can be read at a normal pace without exceeding the specified duration.
-6. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
+4. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
+5. Ensure the narration covers all items once, with each & every media narrations tailored to meet their word count requirement.
+6. Let the narration of ALL medias combined be EXACTLY ${wordsInSeconds(totalSeconds, 182)} words.
 
 Output JSON only in the format like in the example below:
 
@@ -131,7 +133,6 @@ Output JSON only in the format like in the example below:
 }
 
 Here's the project description: ${project.description}
-
 Here are the media items: ${formattedMedia}`;
 
   const result = await generateObject({

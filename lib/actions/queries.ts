@@ -48,10 +48,10 @@ export const getProjectMediaAndNarration = async (projectId: string) => {
 	const [project, media, narration] = await Promise.all([
     prisma.project.findUnique({ where: { id: projectId } }),
     prisma.media.findMany({ where: { projectId } }),
-    prisma.narration.findUnique({ where: { projectId } })
+    prisma.narration.findUnique({ where: { projectId }, select: { transcript: true, audioUrl: true, voice: true } })
   ]);
 
 	if (!project) throw new Error('Project not found!');
 
-  return { media, mediaOrder: project.mediaOrder, narration: narration?.transcript ?? '' };
+  return { media, mediaOrder: project.mediaOrder, narration };
 };

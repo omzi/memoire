@@ -50,7 +50,7 @@ export const saveMedia = async ({
 
 	// Extract IDs of newly added media
   const newMediaIds = data.map(({ url }) => {
-    const media = allMedia.find(m => m.url === url);
+    const media = allMedia.find($ => $.url === url);
     return media?.id;
   }).filter(id => id !== undefined) as string[];
 
@@ -63,7 +63,7 @@ export const saveMedia = async ({
     data: { mediaOrder: updatedMediaOrder }
   });
 
-  return { media: allMedia, mediaOrder: updatedMediaOrder, narration: narration?.transcript ?? '' };
+  return { media: allMedia, mediaOrder: updatedMediaOrder, narration };
 };
 
 export const updateMedia = async ({
@@ -227,4 +227,35 @@ export const updateProjectSettings = async (projectId: string, data: Prisma.Proj
 	});
 
 	return updatedProject;
+};
+
+export const updateNarration = async (projectId: string, data: Prisma.NarrationUpdateInput) => {
+	const [project, narration] = await Promise.all([
+    prisma.project.findUnique({ where: { id: projectId } }),
+    prisma.narration.findUnique({ where: { projectId } })
+  ]);
+
+  if (!project) {
+    throw new Error('Project not found!');
+  }
+
+	if (!narration) {
+		throw new Error('Narration not found!');
+	}
+
+	// Ensure non-allowed fields are not changed
+	const allowedFields = ['transcript', 'audioUrl'] as (keyof Prisma.NarrationUpdateInput)[];
+
+	for (const field in data) {
+		if (!allowedFields.includes(field as keyof Prisma.NarrationUpdateInput)) {
+			delete data[field as keyof Prisma.NarrationUpdateInput];
+		}
+	}
+
+	const updatedNarration = await prisma.narration.update({
+		where: { projectId },
+		data
+	});
+
+	return updatedNarration;
 };

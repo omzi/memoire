@@ -123,7 +123,8 @@ model Media {
 model Narration {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   transcript String
-  audioUrl   String
+  voice      String   @default("echo")
+  audioUrl   String?
   createdAt  DateTime @default(now())
   projectId  String   @db.ObjectId
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -133,7 +134,7 @@ model Narration {
 
 model MusicTrack {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  url       String
+  url       String?
   prompt    String
   vibe      String
   createdAt DateTime @default(now())

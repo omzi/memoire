@@ -26,9 +26,10 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
   const { projectId } = await req.json();
 	
-	const [project, media] = await Promise.all([
+	const [project, media, narration] = await Promise.all([
     prisma.project.findUnique({ where: { id: projectId, userId: token.sub } }),
-    prisma.media.findMany({ where: { projectId } })
+    prisma.media.findMany({ where: { projectId } }),
+    prisma.narration.findUnique({ where: { projectId } })
   ]);
 
   if (!project) {
@@ -79,14 +80,15 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 	});
 
 	const prompt = `You are an event video scriptwriter.
-Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items.
+Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items (containing the ID, the type of media, the duration it's narration should be & the description of the media).
 
 Specifics:
 1. Narrate each item using details like place, date, time, and description in a story format, using first-person and past tense.
 2. The script should mimic a casual storytelling session, as if explaining the trip to friends or family.
 3. Infer logical placements for media items lacking complete information, ensuring continuity and context without guessing.
-4. Ensure the narration covers all items once, with video narrations tailored to not exceed their duration.
-5. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
+4. Ensure the narration covers all items once, with ALL media narrations tailored to meet their duration.
+5. Ensure that each & every media narration can be read at a normal pace without exceeding the specified duration.
+6. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
 
 Output JSON only in the format like in the example below:
 
@@ -118,7 +120,7 @@ Output JSON only in the format like in the example below:
     {
       "id": "64c146bcd5e9ec007c57a17f",
       "type": "video",
-      "text": "Nothing tops this, right? Watching the sunset over the Grand Canyon. The sky's turning into a canvas of oranges, pinks, and reds. It’s moments like these that make this trip unforgettable."
+      "text": "Nothing tops this, right? Watching the sunset over the Grand Canyon. The sky's turning into a canvas of oranges, pinks, and reds. It's moments like these that make this trip unforgettable."
     },
     {
       "id": "64c146bcd5e9ec007c57a170",
@@ -138,6 +140,14 @@ Here are the media items: ${formattedMedia}`;
 		schema: NarrationGenerationSchema,
 		mode: 'json'
   });
+
+	const transcript = result.object.mediaItems.map($ => $.text).join('\n\n');
+
+  if (narration) {
+    await prisma.narration.update({ where: { id: narration.id }, data: { transcript } });
+  } else {
+    await prisma.narration.create({ data: { transcript, projectId: project.id } });
+  }
 
   return result.toJsonResponse();
 };

@@ -255,7 +255,7 @@ const MediaPane = ({
 							disabled={isUploadDisabled}
 							dropzoneOptions={{
 								accept: acceptedFileTypes,
-								maxFiles: 10,
+								maxFiles: 5,
 								maxSize: MAX_FILE_SIZE
 							}}
 							onFilesAdded={async (addedFiles) => {

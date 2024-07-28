@@ -14,8 +14,8 @@ import { useCompletion } from '#/hooks/useCompletion';
 import { MediaItemType, TransitionType } from '#/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
 import TransitionPicker from '#/components/project/TransitionPicker';
+import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GripVerticalIcon, ImageIcon, Loader, SparklesIcon, SquareIcon, Trash2Icon, VideoIcon } from 'lucide-react';
 
 interface MediaItemProps {
@@ -146,9 +146,9 @@ const MediaItem = ({
 						<Image alt='...' width={80} height={80} className='w-20 h-20 hidden' src={media.url} />
 						<div className='flex flex-col flex-1 gap-y-2 mr-px'>
 							<div className='space-y-1'>
-								<Label htmlFor='duration'>Duration</Label>
+								<Label htmlFor={`duration-${media.id}`}>Duration</Label>
 								<Input
-									id='duration'
+									id={`duration-${media.id}`}
 									defaultValue={media.duration}
 									min={1}
 									max={10}
@@ -160,7 +160,7 @@ const MediaItem = ({
 								/>
 							</div>
 							<div className='space-y-1 relative'>
-								<Label htmlFor='description'>Description</Label>
+								<Label htmlFor={`description-${media.id}`}>Description</Label>
 								<form onSubmit={handleFormSubmit} className='absolute right-0 -top-2'>
 									{isLoading ? (
 										<Button size='sm' variant='outline' disabled={isDeleting} onClick={stop} className='bg-red-200 hover:bg-red-600 text-red-600 hover:text-white border-red-600 text-xs w-max h-7 px-2'>
@@ -175,7 +175,7 @@ const MediaItem = ({
 									)}
 								</form>
 								<Textarea
-									id='description'
+									id={`description-${media.id}`}
 									value={input}
 									onChange={handleInputChange}
 									disabled={isLoading || isDeleting}

@@ -10,7 +10,7 @@ const ModeToggle = () => {
 	const { setTheme, theme } = useTheme();
 
 	const toggleTheme = () => {
-		return toast.info('Not available yet ;(', { toastId: 'theme' });
+		return toast.info('Not implemented yet ;(', { toastId: 'theme' });
 		setTheme(theme === 'light' ? 'dark' : 'light');
 	};
 

@@ -61,7 +61,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 		const updatedNarration = await prisma.narration.update({
 			where: { id: narration.id },
 			data: { audioUrl: uploadResult.url }
-		})
+		});
 
 		return NextResponse.json({ message: 'Audio generated!', data: updatedNarration }, { status: 201 });
 	} catch (error) {

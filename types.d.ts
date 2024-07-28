@@ -43,3 +43,4 @@ export type TransitionType = typeof transitions[number]['id'];
 export type Voice = typeof voices[number]['id'];
 export type AspectRatio = typeof aspectRatios[number]['ratio'];
 export type FrameRate = typeof frameRates[number]['value'];
+export type OutputQuality = '4K' | '1080P' | '720P' | '480P';

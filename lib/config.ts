@@ -14,6 +14,8 @@ class Config {
   public BREVO_API_KEY: string;
   public SENDER_EMAIL: string;
   public SENDER_NAME: string;
+  public EMAIL_ACCOUNT_VERIFICATION: string;
+  public EMAIL_PASSWORD_RESET: string;
   public IS_PRODUCTION: boolean;
 
   constructor() {
@@ -28,6 +30,8 @@ class Config {
     this.BREVO_API_KEY = process.env.BREVO_API_KEY || '';
     this.SENDER_EMAIL = process.env.SENDER_EMAIL || '';
     this.SENDER_NAME = process.env.SENDER_NAME || '';
+    this.EMAIL_ACCOUNT_VERIFICATION = process.env.EMAIL_ACCOUNT_VERIFICATION || '';
+    this.EMAIL_PASSWORD_RESET = process.env.EMAIL_PASSWORD_RESET || '';
     this.IS_PRODUCTION = this.NODE_ENV === 'production';
 
     this.validateConfig();

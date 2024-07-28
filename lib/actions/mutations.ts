@@ -38,7 +38,7 @@ export const saveMedia = async ({
 	const [project, allMedia, narration] = await Promise.all([
     prisma.project.findUnique({
       where: { id: projectId },
-      select: { mediaOrder: true }
+      select: { mediaOrder: true, previewUrl: true }
     }),
     prisma.media.findMany({ where: { projectId } }),
 		prisma.narration.findUnique({ where: { projectId } })
@@ -63,7 +63,7 @@ export const saveMedia = async ({
     data: { mediaOrder: updatedMediaOrder }
   });
 
-  return { media: allMedia, mediaOrder: updatedMediaOrder, narration };
+  return { media: allMedia, mediaOrder: updatedMediaOrder, narration, previewUrl: project.previewUrl };
 };
 
 export const updateMedia = async ({

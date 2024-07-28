@@ -1,10 +1,11 @@
 import prisma from '#/lib/prisma';
 import { Redis } from '@upstash/redis';
 import StreamPot from '#/lib/StreamPot';
+import { OutputQuality } from '#/types';
 import { getToken } from 'next-auth/jwt';
-import { reorderByField } from '#/lib/utils';
 import { Ratelimit } from '@upstash/ratelimit';
 import { NextRequest, NextResponse } from 'next/server';
+import { bitrates, getEncodingOptions, getOutputDimensions, reorderByField } from '#/lib/utils';
 
 export const maxDuration = 60;
 const ratelimit = new Ratelimit({
@@ -26,6 +27,7 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
 
 	const { searchParams } = req.nextUrl;
 	const projectId = searchParams.get('projectId');
+  const outputQuality = (searchParams.get('quality') as OutputQuality) || '720P';
 
 	if (!projectId) {
 		return NextResponse.json({ message: 'Invalid request. Provide projectId.' }, { status: 400 });
@@ -57,7 +59,10 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
   let lastStream = 'base';
   let filterIndex = 0;
   let offset = 0;
-  const frameRate = project.frameRate || 24;
+  const frameRate = project.frameRate;
+  const aspectRatio = project.aspectRatio;
+
+  const [outputWidth, outputHeight] = getOutputDimensions(outputQuality, aspectRatio);
 
   for (const media of mediaItems) {
     streampot.input(media.url);
@@ -67,9 +72,9 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
     const loopDuration = media.duration * frameRate;
 
     if (media.type === 'PHOTO') {
-      filterComplex.push(`[${filterIndex}:v]scale=w=1280:h=720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,loop=${loopDuration}:${loopDuration}:0,fps=${frameRate}[${currentStream}]`);
+      filterComplex.push(`[${filterIndex}:v]scale=w=${outputWidth}:h=${outputHeight}:force_original_aspect_ratio=decrease,pad=${outputWidth}:${outputHeight}:(ow-iw)/2:(oh-ih)/2,setsar=1,loop=${loopDuration}:${loopDuration}:0,fps=${frameRate}[${currentStream}]`);
     } else {
-      filterComplex.push(`[${filterIndex}:v]scale=w=1280:h=720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=${frameRate}[${currentStream}]`);
+      filterComplex.push(`[${filterIndex}:v]scale=w=${outputWidth}:h=${outputHeight}:force_original_aspect_ratio=decrease,pad=${outputWidth}:${outputHeight}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=${frameRate}[${currentStream}]`);
     }
 
     if (lastStream !== 'base') {
@@ -85,13 +90,14 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
   }
 
   const combinedFilter = filterComplex.join(';');
+  const encodingOptions = getEncodingOptions(outputQuality);
 
   try {
     streampot.input(narration.audioUrl);
     streampot.audioCodec('aac');
-    streampot.audioBitrate('192k');
-    streampot.videoCodec('libx264');
-    streampot.videoBitrate('1000k', true);
+    streampot.audioBitrate(encodingOptions.audioBitrate);
+    streampot.videoCodec(encodingOptions.videoCodec);
+    streampot.videoBitrate(encodingOptions.videoBitrate, true);
     streampot.outputOptions([
 			'-filter_complex', combinedFilter,
       '-map', `[${lastStream}]`,
@@ -112,6 +118,7 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
 
     console.log('Clip Outputs :>>', clip.outputs);
     console.log('Video :>>', video);
+    await prisma.project.update({ where: { id: project.id }, data: { previewUrl: video } });
 
     return NextResponse.json({ message: 'Preview generated!', data: { preview: video } }, { status: 200 });
   } catch (error) {

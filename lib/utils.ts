@@ -1,3 +1,4 @@
+import { OutputQuality } from '#/types';
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
 
@@ -89,7 +90,7 @@ export const generateOneTimePassword = (length: number): string => {
 
 export const UUIDRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-export const publicRoutes = ['/', '/terms', '/privacy-policy'];
+export const publicRoutes = ['/', '/terms', '/privacy-policy', '/api/edgestore/init'];
 export const authRoutes = [
 	'/auth/totp',
 	'/auth/error',
@@ -311,4 +312,44 @@ export const wordsInSeconds = (seconds: number, wordsPerMinute = 182) => {
   const wordsPerSecond = wordsPerMinute / 60;
 
   return Math.floor(seconds * wordsPerSecond);
+};
+
+export const getOutputDimensions = (quality: OutputQuality, aspectRatio: string): [number, number] => {
+  const [width, height] = aspectRatio.split(':').map(Number);
+  const ratio = width / height;
+
+  switch (quality) {
+    case '4K':
+      return [3840, Math.round(3840 / ratio)];
+    case '1080P':
+      return [1920, Math.round(1920 / ratio)];
+    case '720P':
+      return [1280, Math.round(1280 / ratio)];
+    case '480P':
+      return [854, Math.round(854 / ratio)];
+  }
+};
+
+export const bitrates = {
+  '4K': '15000k',
+  '1080P': '5000k',
+  '720P': '2500k',
+  '480p': '1000k'
+};
+
+export const getEncodingOptions = (outputQuality: OutputQuality) => {
+  const bitrates = {
+    '4K': '15000k',
+    '1080P': '5000k',
+    '720P': '2500k',
+    '480P': '1000k'
+  };
+
+  return {
+    videoBitrate: bitrates[outputQuality],
+    audioBitrate: outputQuality === '4K' ? '256k' : '192k',
+    videoCodec: outputQuality === '4K' ? 'libx265' : 'libx264',
+    preset: outputQuality === '4K' ? 'slow' : 'medium',
+    crf: outputQuality === '4K' ? '18' : '23'
+  };
 };

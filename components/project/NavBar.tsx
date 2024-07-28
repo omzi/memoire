@@ -4,13 +4,14 @@ import {
 	Loader,
 	DownloadIcon
 } from 'lucide-react';
-import { ProjectType } from '#/types';
+import { Fragment } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuContent,
 	DropdownMenuTrigger
 } from '#/components/ui/dropdown-menu';
+import { toast } from 'react-toastify';
 import Logo from '#/components/project/Logo';
 import { useSession } from 'next-auth/react';
 import { Button } from '#/components/ui/button';
@@ -18,9 +19,37 @@ import UserButton from '#/components/UserButton';
 import { Skeleton } from '#/components/ui/skeleton';
 import { generateDefaultAvatar } from '#/lib/utils';
 import TitleBox from '#/components/project/TitleBox';
+import { OutputQuality, ProjectType } from '#/types';
 import { Separator } from '#/components/ui/separator';
 import { useMutationState } from '@tanstack/react-query';
 import { StandardDefinition, HighDefinition, FourK, Video } from '@phosphor-icons/react';
+
+const dropdownItems = [
+	{
+		icon: <FourK className='size-8' />,
+		title: '4K (UHD)',
+		id: '4K',
+		description: 'For large screens'
+	},
+	{
+		icon: <Video className='size-8' />,
+		title: '1080P',
+		id: '1080P',
+		description: 'For streaming'
+	},
+	{
+		icon: <HighDefinition className='size-8' />,
+		title: '720P',
+		id: '720P',
+		description: 'For social media'
+	},
+	{
+		icon: <StandardDefinition className='size-8' />,
+		title: '480P',
+		id: '480P',
+		description: 'For drafts'
+	}
+] as const;
 
 interface NavbarProps {
 	initialData: ProjectType;
@@ -41,6 +70,11 @@ export const Navbar = ({
 
 	const isError = currentStatus === 'error';
 	const isPending = currentStatus === 'pending';
+
+	const onQualitySelect = (quality: OutputQuality) => {
+		console.log('Quality :>>', quality);
+		toast.info('Not implemented yet ;(');
+	};
 
 	return (
 		<nav className='w-full flex items-center p-4 h-[4.5rem] gap-x-8 border-b'>
@@ -90,57 +124,25 @@ export const Navbar = ({
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end' className='min-w-48'>
-							<DropdownMenuItem
-								className='flex items-center gap-x-2 cursor-pointer'
-								onClick={() => {}}
-							>
-								<FourK className='size-8' />
-								<div>
-									<p className='font-medium leading-none'>4K (UHD)</p>
-									<p className='text-xs text-muted-foreground italic'>
-										For large screens
-									</p>
-								</div>
-							</DropdownMenuItem>
-							<Separator orientation='horizontal' className='my-0.5 w-[calc(100%-8px)] mx-auto' />
-							<DropdownMenuItem
-								className='flex items-center gap-x-2 cursor-pointer'
-								onClick={() => {}}
-							>
-								<Video className='size-8' />
-								<div>
-									<p className='font-medium leading-none'>1080P</p>
-									<p className='text-xs text-muted-foreground italic'>
-										For streaming
-									</p>
-								</div>
-							</DropdownMenuItem>
-							<Separator orientation='horizontal' className='my-0.5 w-[calc(100%-8px)] mx-auto' />
-							<DropdownMenuItem
-								className='flex items-center gap-x-2 cursor-pointer'
-								onClick={() => {}}
-							>
-								<HighDefinition className='size-8' />
-								<div>
-									<p className='font-medium leading-none'>720P</p>
-									<p className='text-xs text-muted-foreground italic'>
-										For social media
-									</p>
-								</div>
-							</DropdownMenuItem>
-							<Separator orientation='horizontal' className='my-0.5 w-[calc(100%-8px)] mx-auto' />
-							<DropdownMenuItem
-								className='flex items-center gap-x-2 cursor-pointer'
-								onClick={() => {}}
-							>
-								<StandardDefinition className='size-8' />
-								<div>
-									<p className='font-medium leading-none'>480P</p>
-									<p className='text-xs text-muted-foreground italic'>
-										For drafts
-									</p>
-								</div>
-							</DropdownMenuItem>
+							{dropdownItems.map((item, idx) => (
+								<Fragment key={idx}>
+									<DropdownMenuItem
+										className='flex items-center gap-x-2 cursor-pointer'
+										onClick={() => onQualitySelect(item.id)}
+									>
+										{item.icon}
+										<div>
+											<p className='font-medium leading-none'>{item.title}</p>
+											<p className='text-xs text-muted-foreground italic'>
+												{item.description}
+											</p>
+										</div>
+									</DropdownMenuItem>
+									{idx < dropdownItems.length - 1 && (
+										<Separator orientation='horizontal' className='my-0.5 w-[calc(100%-8px)] mx-auto' />
+									)}
+								</Fragment>
+							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
 					

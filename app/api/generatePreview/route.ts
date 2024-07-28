@@ -6,7 +6,7 @@ import { reorderByField } from '#/lib/utils';
 import { Ratelimit } from '@upstash/ratelimit';
 import { NextRequest, NextResponse } from 'next/server';
 
-export const maxDuration = 90;
+export const maxDuration = 60;
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(2, '12 h')

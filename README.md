@@ -1,6 +1,6 @@
 <p align="center" id="top">
 	<img height="100px" src="public/images/logo.png" alt="Memoire Logo">
-	<p align="center">✨ Create stunning narrated videos from your photos & videos using AI.</p>
+	<p align="center">🧙🏽‍♂️ Create stunning narrated videos from your photos & videos using AI.</p>
 </p>
 
 <div align="center">
@@ -38,7 +38,7 @@ Memoire is an AI-powered application designed to transform your photos and video
 - [x] AI Script Generation
 - [x] AI Audio Generation with Selectable Voices
 - [x] Project Settings
-- [x] Cloud Output Generation
+- [x] Cloud Video Generation
 - [ ] Canvas-Based, In-Browser Output Generation (WIP)
 - [ ] AI Music Generation (WIP)
 - [ ] AI Powered Subtitle Generation (WIP)
@@ -58,7 +58,7 @@ Memoire is an AI-powered application designed to transform your photos and video
 Ensure that your system meets the following requirements:
 
 - [Node.js](https://nodejs.org/) version >= 20.15.0
-- [npm](https://www.npmjs.com/) version >= 9.8.1
+- [npm](https://www.npmjs.com/) version >= 10.3.0
 
 ## ⚡ **Installation**
 

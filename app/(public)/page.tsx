@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: 'Capture. Narrate. Cherish. ~ Memoire',
-	description: '✨ Create stunning narrated videos from your photos & videos using AI.'
+	description: '🧙🏽‍♂️ Create stunning narrated videos from your photos & videos using AI.'
 }
 
 const Page = async () => {

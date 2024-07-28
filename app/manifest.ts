@@ -4,7 +4,7 @@ const manifest = (): MetadataRoute.Manifest => {
 	return {
 		name: 'Memoire',
 		short_name: 'Memoire',
-		description: '✨ Create stunning narrated videos from your photos & videos using AI.',
+		description: '🧙🏽‍♂️ Create stunning narrated videos from your photos & videos using AI.',
 		start_url: '/home',
 		display: 'standalone',
 		background_color: '#ffffff',

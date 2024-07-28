@@ -28,6 +28,7 @@ const VideoPreview = ({
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isFFMPEGLoading, setIsFFMPEGLoading] = useState(false);
+	const [generationProgress, setGenerationProgress] = useState(0);
 	const [mediaItems, setMediaItems] = useState<MediaItemType[]>([]);
 
 	const { isPending: projectLoading, data: project } = useQuery({
@@ -63,6 +64,10 @@ const VideoPreview = ({
 			const ffmpeg = FFMPEGRef.current
 			ffmpeg.on('log', ({ message }) => {
 				console.log('[FFmpeg]:>>', message);
+			});
+
+			ffmpeg.on('progress', ({ progress }) => {
+				setGenerationProgress(Math.round(progress));
 			});
 			
 			// Check if FFmpeg core and WASM are in IndexedDB
@@ -226,6 +231,12 @@ const VideoPreview = ({
 							</div>
 						)}
 					</Button>
+
+					{false && (
+						<div className='w-full sm:w-96 mx-auto bg-gray-200 rounded-full dark:bg-gray-700'>
+							<div className='bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full' style={{ width: `${generationProgress}%` }}>{generationProgress}%</div>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

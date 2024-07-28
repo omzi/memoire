@@ -220,7 +220,7 @@ const NarrationPane = ({
 		fetchVoices();
 	}, []);
 
-	const isDisabled = projectNarrationLoading || isLoading || !narration || isGeneratingAudio;
+	const isDisabled = projectNarrationLoading || isLoading || isGeneratingAudio;
 
 	return (
 		<aside
@@ -324,7 +324,7 @@ const NarrationPane = ({
 									Cancel generation
 								</Button>
 							) : (
-								<Button onClick={handleAudioGeneration} size='sm' disabled={isDisabled} className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
+								<Button onClick={handleAudioGeneration} size='sm' disabled={isDisabled || !narration} className='bg-black hover:bg-core text-white text-xs w-max h-7 px-2'>
 									<PodcastIcon className='size-3.5 mr-1.5' />
 									Generate narration
 								</Button>

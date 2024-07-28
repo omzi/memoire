@@ -50,7 +50,6 @@ const NarrationPane = ({
 				const projectMedia = await getProjectMediaAndNarration(projectId);
 				
 				if (projectMedia.narration) {
-					console.log('projectMedia.narration :>>', projectMedia.narration);
 					setAudioUrl(projectMedia.narration.audioUrl ?? '');
 					setNarration(projectMedia.narration.transcript ?? '');
 					setSelectedVoice(projectMedia.narration.voice as Voice);

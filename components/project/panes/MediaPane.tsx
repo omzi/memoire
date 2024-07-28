@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { Prisma } from '@prisma/client';
-import { SaveIcon } from 'lucide-react';
 import { useEdgeStore } from '#/lib/edgestore';
 import { Button } from '#/components/ui/button';
 import useExitPrompt from '#/hooks/useExitPrompt';
 import { useDebounceCallback } from 'usehooks-ts';
 import { Skeleton } from '#/components/ui/skeleton';
 import MediaItem from '#/components/project/MediaItem';
+import { LightbulbIcon, SaveIcon, StarIcon } from 'lucide-react';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { getProjectMediaAndNarration } from '#/lib/actions/queries';
@@ -323,6 +323,17 @@ const MediaPane = ({
 									<Skeleton className='flex-1 h-6 rounded' />
 								</div>
 							))}
+
+							{/* Tip */}
+							{!projectMediaLoading && mediaItems.length > 0 && (
+								<div className='bg-core border-l-4 border-primary/20 p-2.5 mt-3 rounded-lg relative overflow-hidden'>
+									<StarIcon className='h-36 w-36 text-white absolute right-2 -top-9 z-0 stroke-1 opacity-20' />
+									<p className='text-sm font-bold text-white'>Pro Tip</p>
+									<p className='mt-1 text-sm text-white'>
+										Arrange your media in chronological order for best results.
+									</p>
+								</div>
+							)}
 
 							<DndContext
 								sensors={sensors}

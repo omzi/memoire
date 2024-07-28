@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { cn } from '#/lib/utils';
 import { ActivePane } from '#/types';
 import Sidebar from '#/components/project/Sidebar';
+import VideoPreview from '#/components/VideoPreview';
+import NoSSRWrapper from '#/components/NoSSRWrapper';
 import MediaPane from '#/components/project/panes/MediaPane';
 import MusicPane from '#/components/project/panes/MusicPane';
 import SettingsPane from '#/components/project/panes/SettingsPane';
@@ -52,8 +53,10 @@ const ProjectEditor = ({
 				activePane={activePane}
 				onPaneChange={onPaneChange}
 			/>
-			<main className={cn('bg-muted flex-1 overflow-auto ml-0 relative transition-all duration-150', activePane === null && '-ml-[360px]')}>
-				{/* TODO: Add video component to play interim results */}
+			<main className='bg-muted flex-1 overflow-hidden relative'>
+				<NoSSRWrapper>
+					<VideoPreview projectId={projectId} />
+				</NoSSRWrapper>
 			</main>
 		</div>
 	)

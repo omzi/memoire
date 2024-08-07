@@ -3,8 +3,8 @@
 import { useEffect } from 'react';
 import { ProjectType } from '#/types';
 import { Navbar } from '#/components/project/NavBar';
-import { useMutationState, useQueryClient } from '@tanstack/react-query';
 import ProjectEditor from '#/components/project/ProjectEditor';
+import { useMutationState, useQueryClient } from '@tanstack/react-query';
 
 interface ProjectIdProps {
 	initialData: ProjectType;
@@ -17,6 +17,7 @@ const ProjectId = ({
 	initialData,
 	params
 }: ProjectIdProps) => {
+	const queryClient = useQueryClient();
 	const data = useMutationState({
 		filters: {
 			mutationKey: [`project-${initialData.id}`],
@@ -24,8 +25,11 @@ const ProjectId = ({
 		},
 		select: (mutation) => mutation.state.data
 	});
-	const queryClient = useQueryClient();
 	const currentData = data[data.length - 1] as ProjectType | undefined;
+
+	const startOnboarding = () => {
+		// TODO: Start onboarding here...
+	};
 
 	useEffect(() => {
 		if (currentData) {
@@ -35,6 +39,15 @@ const ProjectId = ({
 			if (currentData.title) {
 				window.document.title = `${currentData.title} / Project ~ Memoire`;
 			}
+		}
+
+		// Start onboarding if user has onboarded...
+		const hasUserOnboarded = Boolean(localStorage.getItem('hasUserOnboarded'));
+		console.log('hasUserOnboarded :>>', hasUserOnboarded);
+		if (!hasUserOnboarded) {
+			setTimeout(() => {
+				startOnboarding();
+			}, 3e3);
 		}
 	}, [currentData]);
 	

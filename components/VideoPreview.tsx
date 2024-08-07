@@ -48,6 +48,7 @@ const VideoPreview = ({
 
 	const generatePreview = async () => {
 		setIsProcessing(true);
+		setVideoSrc('');
 
 		try {
 			const response = await fetch(`/api/generatePreview?projectId=${projectId}`, {
@@ -95,7 +96,7 @@ const VideoPreview = ({
 					<p className='text-muted-foreground text-sm'>Feel free to start uploading your media</p>
 				</div>
 			) : videoSrc ? (
-					<video controls autoPlay src={videoSrc} ref={videoRef} className='w-full max-h-full my-auto rounded-lg' />
+					<video controls autoPlay onDoubleClick={generatePreview} src={videoSrc} ref={videoRef} className='w-full max-h-full my-auto rounded-lg' />
 				) : (
 				<div className='flex flex-col items-center justify-center h-svh gap-y-4'>
 					<Image

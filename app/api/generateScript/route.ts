@@ -4,6 +4,7 @@ import { Redis } from '@upstash/redis';
 import { google } from '@ai-sdk/google';
 import { getToken } from 'next-auth/jwt';
 import { wordsInSeconds } from '#/lib/utils';
+import { createOpenAI } from '@ai-sdk/openai';
 import { Ratelimit } from '@upstash/ratelimit';
 import { NextRequest, NextResponse } from 'next/server';
 import { NarrationGenerationSchema } from '#/lib/validations';
@@ -12,6 +13,11 @@ export const maxDuration = 30;
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(6, '60 s')
+});
+const ai71 = createOpenAI({
+  baseURL: 'https://api.ai71.ai/v1/',
+  apiKey: process.env.AI71_API_KEY,
+  compatibility: 'compatible'
 });
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
@@ -54,43 +60,27 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 			type: $.type,
 			description: $.description,
 			duration: $.duration,
-      scriptWordCount: wordsInSeconds($.duration, 182)
+      narrationWordCount: wordsInSeconds($.duration, 182)
 		}
 	});
   
-  const totalSeconds = media.reduce((total, item) => total + item.duration, 0);
-	
-  const model = google('models/gemini-1.5-pro-latest', {
-		safetySettings: [
-			{
-				category: 'HARM_CATEGORY_HARASSMENT',
-				threshold: 'BLOCK_NONE'
-			},
-			{
-				category: 'HARM_CATEGORY_HATE_SPEECH',
-				threshold: 'BLOCK_NONE'
-			},
-			{
-				category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-				threshold: 'BLOCK_NONE'
-			},
-			{
-				category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-				threshold: 'BLOCK_NONE'
-			}
-		]
-	});
+  const totalDuration = media.reduce((total, item) => total + item.duration, 0);
+
+  const model = ai71('tiiuae/falcon-180b-chat');
+  console.log('AI71 Model :>>', model);
 
 	const prompt = `You are an event video scriptwriter.
-Please draft a script that chronologically narrates a series of photos and videos from an event, based on a provided description of the event & an array of media items (containing the ID, the type of media, the duration it's narration should be, the description of the media, and the EXACT word count of the script you'll generate for the media).
+Please draft a script that chronologically narrates a series of photos and videos from a project, based on a provided description of the event & an array of media items (containing the ID, the type of media, the duration it's narration should be, the description of the media, and the EXACT word count of the narration you'll generate for the media).
 
 Instructions:
-1. Narrate each item using details like place, date, time, and description in a story format, using first-person and past tense.
+1. Narrate each item using details from the media description in a story format, using first-person and past tense.
 2. The script should mimic a casual storytelling session, as if explaining the trip to friends or family.
-3. Infer logical placements for media items lacking complete information, ensuring continuity and context without guessing.
-4. Use short, clear sentences to maintain engagement and clarity in each scene's narration.
-5. Ensure the narration covers all items once, with each & every media narrations tailored to meet their word count requirement.
-6. Let the narration of ALL medias combined be EXACTLY ${wordsInSeconds(totalSeconds, 182)} words.
+3. Ensure continuity and context without making up things outside of the media descriptions.
+4. Use short, clear sentences to maintain engagement and clarity in each media's narration.
+5. Ensure the narration covers all items once, with each & every media narrations not exceeding their respective script word count.
+6. Let the narration of ALL medias combined be EXACTLY ${wordsInSeconds(totalDuration, 182)} words.
+7. Do not reference the media type in your narrations. The user can see what media type is being narrated.
+8. If the project deascription does not make sense, use the media descriptions to figure out what the project is about.
 
 Output JSON only in the format like in the example below:
 
@@ -101,43 +91,46 @@ Output JSON only in the format like in the example below:
   "mediaItems": [
     {
       "id": "64c146bcd5e9ec007c57a17b",
-      "type": "video",
+      "type": "VIDEO",
       "text": "Hey everyone! We're hitting the road at the crack of dawn, super excited to start our adventure to the Grand Canyon. Everything's packed, and we're ready to go!"
     },
     {
       "id": "64c146bcd5e9ec007c57a17c",
-      "type": "photo",
+      "type": "PHOTO",
       "text": "Look at this view, folks! Miles of open road ahead of us. The landscapes are just stunning and the vibe in the car is just full of anticipation."
     },
     {
       "id": "64c146bcd5e9ec007c57a17d",
-      "type": "video",
+      "type": "VIDEO",
       "text": "And we're here! Stepping into the Grand Canyon National Park now. I can't wait to show you all the incredible views we've been talking about."
     },
     {
       "id": "64c146bcd5e9ec007c57a17e",
-      "type": "photo",
+      "type": "PHOTO",
       "text": "Here's our first stop. Just take in this breathtaking panorama of the canyon. The sheer size and beauty of it all is something you have to see to believe!"
     },
     {
       "id": "64c146bcd5e9ec007c57a17f",
-      "type": "video",
+      "type": "VIDEO",
       "text": "Nothing tops this, right? Watching the sunset over the Grand Canyon. The sky's turning into a canvas of oranges, pinks, and reds. It's moments like these that make this trip unforgettable."
     },
     {
       "id": "64c146bcd5e9ec007c57a170",
-      "type": "photo",
+      "type": "PHOTO",
       "text": "Ending our day around the campfire, under the stars. Sharing stories, roasting marshmallows. It's the perfect way to wrap up a perfect day. Thanks for joining us, and see you on the next adventure!"
     }
   ]
 }
 
 Here's the project description: ${project.description}
-Here are the media items: ${formattedMedia}`;
+Here are the media items: ${formattedMedia}.
+
+Use them to generate a JSON output similar to the JSON example above.`;
 
   const result = await generateObject({
     model,
 		prompt,
+    temperature: 0.5,
 		schema: NarrationGenerationSchema,
 		mode: 'json'
   });

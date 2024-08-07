@@ -314,6 +314,22 @@ export const wordsInSeconds = (seconds: number, wordsPerMinute = 182) => {
   return Math.floor(seconds * wordsPerSecond);
 };
 
+export const readingTimeInSeconds = (text: string, wordsPerMinute = 182, bufferPercentage = 0.05) => {
+  const words = text.split(/\s+/).length;
+  const wordsPerSecond = wordsPerMinute / 60;
+  const readingTime = words / wordsPerSecond;
+  
+  const bufferTime = readingTime * bufferPercentage;
+  
+  return Math.ceil(readingTime + bufferTime);
+};
+
+export const secondsToWords = (seconds: number, wordsPerMinute = 182) => {
+	const wordsPerSecond = wordsPerMinute / 60;
+
+	return Math.ceil(seconds * wordsPerSecond);
+};
+
 export const getOutputDimensions = (quality: OutputQuality, aspectRatio: string): [number, number] => {
   const [width, height] = aspectRatio.split(':').map(Number);
   const ratio = width / height;

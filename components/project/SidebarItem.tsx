@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 
 interface SidebarItemProps {
+	id: string;
 	icon: LucideIcon;
 	label: string;
 	isActive?: boolean;
@@ -10,6 +11,7 @@ interface SidebarItemProps {
 };
 
 const SidebarItem = ({
+	id,
 	icon: Icon,
 	label,
 	isActive,
@@ -17,6 +19,7 @@ const SidebarItem = ({
 }: SidebarItemProps) => {
 	return (
 		<Button
+			id={id}
 			variant='ghost'
 			onClick={onClick}
 			className={cn(

@@ -146,11 +146,11 @@ const MediaItem = ({
 						<Image alt='...' width={80} height={80} className='w-20 h-20 hidden' src={media.url} />
 						<div className='flex flex-col flex-1 gap-y-2 mr-px'>
 							<div className='space-y-1'>
-								<Label htmlFor={`duration-${media.id}`}>Duration</Label>
+								<Label htmlFor={`duration-${media.id}`}>Duration <span className='italic text-muted-foreground'>(in seconds)</span></Label>
 								<Input
 									id={`duration-${media.id}`}
 									defaultValue={media.duration}
-									min={1}
+									min={5}
 									max={10}
 									type='number'
 									className='p-2 h-8'

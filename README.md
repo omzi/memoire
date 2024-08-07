@@ -50,7 +50,7 @@ Memoire is an AI-powered application designed to transform your photos and video
 - **_Styling_**: Tailwind CSS, shadcn/ui components
 - **_Rate Limit_**: Upstash
 - **_Authentication_**: Next Auth
-- **_AI Models_**: Google's Gemini 1.5 Pro, OpenAI's TTS-1, Meta's Music Gen, OpenAI's Whisper
+- **_AI Models_**: AI71's Falcon 140B, Google's Gemini 1.5 Pro, OpenAI's TTS-1, Meta's Music Gen, OpenAI's Whisper
 - **_Cloud Video Generation_**: StreamPot
 
 ## 🚩 **Prerequisites**

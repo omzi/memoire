@@ -2,7 +2,7 @@
 
 import { toast } from 'react-toastify';
 import { Prisma } from '@prisma/client';
-import { cn, voices } from '#/lib/utils';
+import { cn, readingTimeInSeconds, voices } from '#/lib/utils';
 import { Label } from '#/components/ui/label';
 import { Button } from '#/components/ui/button';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -17,8 +17,9 @@ import { getProjectMediaAndNarration } from '#/lib/actions/queries';
 import SidebarPaneHeader from '#/components/project/SidebarPaneHeader';
 import SidebarPaneCloseButton from '#/components/project/SidebarPaneCloseButton';
 import { ChangeEvent, FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { SquareIcon, SparklesIcon, ChevronDownIcon, MicIcon, PlayIcon, PauseIcon, PodcastIcon } from 'lucide-react';
+import { SquareIcon, SparklesIcon, ChevronDownIcon, MicIcon, PlayIcon, PauseIcon, PodcastIcon, AlertTriangleIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '#/components/ui/dropdown-menu';
+import { useCompletion } from '#/hooks/useCompletion';
 
 interface NarrationPaneProps {
 	projectId: string;
@@ -43,7 +44,7 @@ const NarrationPane = ({
 	const [fetchedVoices, setFetchedVoices] = useState<Map<string, string>>(new Map());
 	const [abortController, setAbortController] = useState<AbortController | null>(null);
 
-	const { isPending: projectNarrationLoading } = useQuery({
+	const { isPending: projectNarrationLoading, data: projectMedia } = useQuery({
 		queryKey: ['narration'],
 		queryFn: async () => {
 			try {
@@ -84,6 +85,26 @@ const NarrationPane = ({
 			setAbortController(null);
 		}
 	}, [abortController]);
+
+	const { completion: shortenedNarration, trigger: shorten, isLoading: isShortening, stop: stopShortening } = useCompletion({
+		api: '/api/shorten',
+		body: { projectId },
+		onResponse: (res) => {
+			if (res.status === 429) {
+				toast.error(`You've been rate limited! Please try again later.`);
+			}
+		},
+		onFinish(_, completion) {
+			setNarration(completion.trim());
+			debouncedUpdateNarration({ transcript: completion.trim() });
+		}
+	});
+
+	useEffect(() => {
+		if (shortenedNarration) {
+			setNarration(shortenedNarration.trim());
+		}
+	}, [shortenedNarration]);
 	
 	const onClose = () => {
 		onPaneChange(null);
@@ -153,6 +174,8 @@ const NarrationPane = ({
 	};
 
 	const handleNarrationChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+		if (isShortening) return;
+
 		if (narration) {
 			debouncedUpdateNarration({ transcript: e.target.value });
 		}
@@ -220,7 +243,14 @@ const NarrationPane = ({
 		fetchVoices();
 	}, []);
 
-	const isDisabled = projectNarrationLoading || isLoading || isGeneratingAudio;
+	const isDisabled = projectNarrationLoading || isLoading || isShortening || isGeneratingAudio;
+	const totalDuration = projectMedia ? projectMedia.media.reduce((total, item) => total + item.duration, 0) : 0;
+	const isNarrationWarningActive = projectMedia && narration.length > 0
+		? readingTimeInSeconds(narration) > totalDuration
+		: false;
+
+	console.log('totalDuration :>>', totalDuration);
+	console.log('readingTimeInSeconds(narration) :>>', readingTimeInSeconds(narration));
 
 	return (
 		<aside
@@ -281,6 +311,28 @@ const NarrationPane = ({
 							/>
 							<span className='text-xs text-muted-foreground absolute right-0 -bottom-5 select-none'>{narration.length}/1500</span>
 						</div>
+
+						{/* Narration Warning */}
+						{isNarrationWarningActive && (
+							<div className='bg-yellow-500 border-l-4 border-primary/20 p-2.5 mt-3 rounded-lg relative overflow-hidden'>
+								<AlertTriangleIcon className='h-36 w-36 text-white absolute right-2 -top-9 z-0 stroke-1 opacity-20' />
+								<p className='text-sm font-bold text-white'>Warning</p>
+								<p className='mt-1 text-sm text-white'>
+									The time taken to read this narration exceeds the total duration of your project. Click the button below to shorten it.
+								</p>
+								{isShortening ? (
+									<Button size='sm' variant='outline' onClick={stopShortening} className='mt-1.5 bg-red-600 text-white border-red-600 hover:border-black text-xs w-max h-7 px-2'>
+										<SquareIcon className='size-3.5 mr-1.5' />
+										Stop shortening
+									</Button>
+								) : (
+									<Button size='sm' type='submit' onClick={() => shorten()} disabled={isDisabled} className='mt-1.5 bg-black/20 hover:bg-black text-white text-xs w-max h-7 px-2'>
+										<SparklesIcon className='size-3.5 mr-1.5' />
+										Shorten with AI
+									</Button>
+								)}
+							</div>
+						)}
 
 						<div className='space-y-1'>
 							<Label htmlFor='voice'>Voice</Label>
